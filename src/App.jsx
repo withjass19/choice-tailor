@@ -27,7 +27,7 @@ import Categories from "./pages/Admin/Categories/Categories";
 import Inventory from "./pages/Admin/Inventory/Inventory";
 import ProtectedRoute from "./routes/ProtectedRoute";
 import AdminRoute from "./routes/AdminRoute";
-// import Contact from "./pages/Contact/Contact";
+import Contact from "./pages/Contact/Contact";
 
 export default function App() {
   return (
@@ -40,7 +40,7 @@ export default function App() {
         <Route path="/about" element={<About />} />
         {/* <Route path="/contact" element={<Contact/>} /> */}
         
-        {/* <Route path="/contact" element={<Contact/>} /> */}
+        <Route path="/contact" element={<Contact />} />
         {/* <Route path="/track-order" element={<TrackOrder />} /> */}
         <Route path="/product" element={<ProductDetails />} />
         <Route path="/measurement-guide" element={<MeasurementGuide />} />
