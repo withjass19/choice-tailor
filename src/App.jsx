@@ -5,7 +5,7 @@ import MainLayout from "./layouts/MainLayout";
 import Home from "./pages/Home/Home";
 import Shop from "./pages/Shop/Shop";
 import About from "./pages/About/About";
-import Contact from "./pages/Contact/contact";
+// import Contact from "./pages/Contact/Contact";
 import ProductDetails from "./pages/Product/ProductDetails/ProductDetails";
 import MeasurementGuide from "./pages/MeasurementGuide/MeasurementGuide";
 import LoginPage from "./pages/Login/Login";
@@ -27,6 +27,7 @@ import Categories from "./pages/Admin/Categories/Categories";
 import Inventory from "./pages/Admin/Inventory/Inventory";
 import ProtectedRoute from "./routes/ProtectedRoute";
 import AdminRoute from "./routes/AdminRoute";
+import Contact from "./pages/Contact/Contact";
 
 export default function App() {
   return (
@@ -38,6 +39,8 @@ export default function App() {
         <Route path="/shop" element={<Shop />} />
         <Route path="/about" element={<About />} />
         <Route path="/contact" element={<Contact/>} />
+        
+        {/* <Route path="/contact" element={<Contact/>} /> */}
         {/* <Route path="/track-order" element={<TrackOrder />} /> */}
         <Route path="/product" element={<ProductDetails />} />
         <Route path="/measurement-guide" element={<MeasurementGuide />} />
