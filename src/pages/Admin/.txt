@@ -1,0 +1,36 @@
+src/
+│
+├── pages/
+│   └── admin/
+│
+│       ├── dashboard/
+│       │   └── Dashboard.jsx
+│       │
+│       ├── orders/
+│       │   ├── Orders.jsx
+│       │   └── OrderDetails.jsx
+│       │
+│       ├── measurements/
+│       │   ├── Measurements.jsx
+│       │   └── MeasurementDetails.jsx
+│       │
+│       ├── products/
+│       │   ├── Products.jsx
+│       │   ├── CreateProduct.jsx
+│       │   └── EditProduct.jsx
+│       │
+│       ├── customers/
+│       │   ├── Customers.jsx
+│       │   └── CustomerDetails.jsx
+│       │
+│       ├── Categories.jsx
+│       ├── Inventory.jsx
+│       ├── Production.jsx
+│       ├── Reports.jsx
+│       ├── Coupons.jsx
+│       ├── Notifications.jsx
+│       ├── AdminUsers.jsx
+│       ├── Settings.jsx
+│       │
+│       ├── components/
+│       └── layout/
