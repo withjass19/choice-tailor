@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { upload } from "@imagekit/react";
 import { FormProvider, useForm } from "react-hook-form";
 
 import BasicInformation from "./_components/BasicInformation";
@@ -15,26 +14,22 @@ import FormActions from "./_components/FormActions";
 export default function CreateProduct() {
   const [loading, setLoading] = useState(false);
   const [productImages, setProductImages] = useState([]);
+  const [uploadedImageUrls, setUploadedImageUrls] = useState([]);
 
   const methods = useForm({
     defaultValues: {
-      // Basic Information
       productName: "",
       sku: "",
       category: "",
       subCategory: "",
       shortDescription: "",
       detailedDescription: "",
-
-      // Pricing & Stock
       price: "",
       comparePrice: "",
       costPrice: "",
       stockQuantity: "",
       lowStockAlert: "",
       trackInventory: true,
-
-      // Product Details
       brand: "",
       fabric: "",
       color: "",
@@ -44,15 +39,11 @@ export default function CreateProduct() {
       fit: "Regular Fit",
       productWeight: "",
       careInstructions: "",
-
-      // Product Status
       status: "Active",
       featuredProduct: false,
       bestSeller: false,
       newArrival: false,
       allowBackorders: false,
-
-      // Measurement Settings
       measurementRequired: true,
       allowStandardSizes: true,
       allowCustomNotes: true,
@@ -67,15 +58,11 @@ export default function CreateProduct() {
         "Hip",
         "Inseam",
       ],
-
-      // Additional Information
       productTags: "",
       metaTitle: "",
       metaDescription: "",
       slug: "",
       internalNotes: "",
-
-      // Shipping Details
       shippingWeight: "",
       packageLength: "",
       packageWidth: "",
@@ -88,47 +75,13 @@ export default function CreateProduct() {
     },
   });
 
-  const authenticator = async () => {
-    const res = await fetch("/api/imagekit-auth");
-    const text = await res.text();
-
-    console.log("ImageKit auth raw response:", text);
-
-    if (!res.ok) throw new Error("ImageKit auth failed");
-
-    return JSON.parse(text);
-  };
-
   const onSubmit = async (formData) => {
     try {
       setLoading(true);
 
-      const files = productImages.map((img) => img.file);
-
-      const authParams = await authenticator();
-
-      console.log("Auth Params:", authParams);
-      console.log("Public Key:", import.meta.env.VITE_IMAGEKIT_PUBLIC_KEY);
-
-      const uploadedImages = await Promise.all(
-        files.map((file) =>
-          upload({
-            file,
-            fileName: `${Date.now()}-${file.name}`,
-            publicKey: import.meta.env.VITE_IMAGEKIT_PUBLIC_KEY,
-            signature: authParams.signature,
-            expire: authParams.expire,
-            token: authParams.token,
-            folder: "/choice-tailor/products",
-          }),
-        ),
-      );
-
-      const imageUrls = uploadedImages.map((img) => img.url);
-
       const finalProductData = {
         ...formData,
-        images: imageUrls,
+        images: uploadedImageUrls,
       };
 
       console.log("Final Product Data:", finalProductData);
@@ -157,7 +110,10 @@ export default function CreateProduct() {
             <ProductImages
               images={productImages}
               setImages={setProductImages}
+              uploadedImageUrls={uploadedImageUrls}
+              setUploadedImageUrls={setUploadedImageUrls}
             />
+
             <PricingStock />
             <ProductStatus />
             <AdditionalInformation />
