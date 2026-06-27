@@ -1,4 +1,19 @@
+import { useFormContext } from "react-hook-form";
+
+const fields = [
+  "Neck",
+  "Shoulder",
+  "Chest",
+  "Sleeve Length",
+  "Shirt Length",
+  "Waist",
+  "Hip",
+  "Inseam",
+];
+
 export default function MeasurementSettings() {
+  const { register, watch, setValue } = useFormContext();
+
   return (
     <div className="rounded-xl border bg-white p-6 shadow-sm">
       <h2 className="text-lg font-bold text-[#061735]">
@@ -7,27 +22,34 @@ export default function MeasurementSettings() {
 
       <div className="mt-6 space-y-5">
         <Toggle
-          active
+          name="measurementRequired"
           label="Measurement Required"
           desc="Customer must select or create a measurement profile before ordering"
+          watch={watch}
+          setValue={setValue}
         />
 
         <Toggle
+          name="allowStandardSizes"
           label="Allow Standard Sizes"
           desc="Customer can choose standard sizes like S, M, L, XL"
+          watch={watch}
+          setValue={setValue}
         />
 
         <Toggle
-          active
+          name="allowCustomNotes"
           label="Allow Custom Notes"
           desc="Customer can add special stitching or fitting instructions"
+          watch={watch}
+          setValue={setValue}
         />
 
-        <Select label="Measurement Template">
-          <option>Shirt & Trouser Measurements</option>
-          <option>Coat Measurements</option>
-          <option>Flying Overall Measurements</option>
-          <option>Accessory Measurements</option>
+        <Select label="Measurement Template" {...register("measurementTemplate")}>
+          <option value="Shirt & Trouser Measurements">Shirt & Trouser Measurements</option>
+          <option value="Coat Measurements">Coat Measurements</option>
+          <option value="Flying Overall Measurements">Flying Overall Measurements</option>
+          <option value="Accessory Measurements">Accessory Measurements</option>
         </Select>
 
         <div>
@@ -36,24 +58,16 @@ export default function MeasurementSettings() {
           </label>
 
           <div className="grid gap-3 sm:grid-cols-2">
-            {[
-              "Neck",
-              "Shoulder",
-              "Chest",
-              "Sleeve Length",
-              "Shirt Length",
-              "Waist",
-              "Hip",
-              "Inseam",
-            ].map((item) => (
+            {fields.map((item) => (
               <label
                 key={item}
                 className="flex items-center gap-3 rounded-lg border px-4 py-3 text-sm"
               >
                 <input
                   type="checkbox"
-                  defaultChecked
+                  value={item}
                   className="accent-[#b89b3c]"
+                  {...register("measurementFields")}
                 />
                 {item}
               </label>
@@ -65,7 +79,9 @@ export default function MeasurementSettings() {
   );
 }
 
-function Toggle({ label, desc, active }) {
+function Toggle({ name, label, desc, watch, setValue }) {
+  const value = watch(name);
+
   return (
     <div className="flex items-center justify-between gap-4 rounded-lg border p-4">
       <div>
@@ -74,13 +90,15 @@ function Toggle({ label, desc, active }) {
       </div>
 
       <button
+        type="button"
+        onClick={() => setValue(name, !value)}
         className={`relative h-6 w-11 rounded-full ${
-          active ? "bg-[#061735]" : "bg-gray-300"
+          value ? "bg-[#061735]" : "bg-gray-300"
         }`}
       >
         <span
           className={`absolute top-1 h-4 w-4 rounded-full bg-white ${
-            active ? "right-1" : "left-1"
+            value ? "right-1" : "left-1"
           }`}
         />
       </button>
@@ -88,13 +106,13 @@ function Toggle({ label, desc, active }) {
   );
 }
 
-function Select({ label, children }) {
+function Select({ label, children, ...props }) {
   return (
     <div>
       <label className="mb-2 block text-sm font-semibold text-[#061735]">
         {label}
       </label>
-      <select className="w-full rounded-lg border px-4 py-3 text-sm outline-none">
+      <select {...props} className="w-full rounded-lg border px-4 py-3 text-sm outline-none">
         {children}
       </select>
     </div>
