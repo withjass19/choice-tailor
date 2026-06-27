@@ -11,7 +11,7 @@ import {
 import { useAuth } from "@/hooks/useAuth";
 import UserDropdown from "../_customComponents/UserDropdown/UserDropdown";
 
-export default function Navbar() {
+export default function NavBar() {
   const [isOpen, setIsOpen] = useState(false);
   const navigation = useNavigate();
    const { user, profile, isAuthenticated, logoutUser } = useAuth();
