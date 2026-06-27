@@ -107,10 +107,13 @@ export default function CreateProduct() {
 
       const authParams = await authenticator();
 
+      console.log("Auth Params:", authParams);
+      console.log("Public Key:", import.meta.env.VITE_IMAGEKIT_PUBLIC_KEY);
+
       const uploadedImages = await Promise.all(
         files.map((file) =>
           upload({
-            publicKey: import.meta.env.VITE_IMAGEKIT_PUBLIC_KEY,
+            publicKey: process.env.IMAGEKIT_PUBLIC_KEY,
             signature: authParams.signature,
             expire: authParams.expire,
             token: authParams.token,
