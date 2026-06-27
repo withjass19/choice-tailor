@@ -1,33 +1,33 @@
-// import crypto from "crypto";
-
-// export default function handler(req, res) {
-//   const token = crypto.randomUUID();
-//   const expire = Math.floor(Date.now() / 1000) + 60 * 5;
-
-//   const privateKey = import.meta.env.VITE_IMAGEKIT_PRIVATE_KEY;
-
-//   const signature = crypto
-//     .createHmac("sha1", privateKey)
-//     .update(token + expire)
-//     .digest("hex");
-
-//   res.status(200).json({
-//     token,
-//     expire,
-//     signature,
-//   });
-// }
 import ImageKit from "imagekit";
 
-const imagekit = new ImageKit({
-  publicKey: import.meta.env.IMAGEKIT_PUBLIC_KEY,
-  privateKey: import.meta.env.IMAGEKIT_PRIVATE_KEY,
-  urlEndpoint: import.meta.env.IMAGEKIT_URL_ENDPOINT,
-});
-
 export default function handler(req, res) {
-  const authenticationParameters =
-    imagekit.getAuthenticationParameters();
+  try {
+    if (
+      !import.meta.env.IMAGEKIT_PUBLIC_KEY ||
+      !import.meta.env.IMAGEKIT_PRIVATE_KEY ||
+      !import.meta.env.IMAGEKIT_URL_ENDPOINT
+    ) {
+      return res.status(400).json({
+        error: "Missing ImageKit env variables",
+        hasPublicKey: !!import.meta.env.IMAGEKIT_PUBLIC_KEY,
+        hasPrivateKey: !!import.meta.env.IMAGEKIT_PRIVATE_KEY,
+        hasUrlEndpoint: !!import.meta.env.IMAGEKIT_URL_ENDPOINT,
+      });
+    }
 
-  res.status(200).json(authenticationParameters);
+    const imagekit = new ImageKit({
+      publicKey: import.meta.env.IMAGEKIT_PUBLIC_KEY,
+      privateKey: import.meta.env.IMAGEKIT_PRIVATE_KEY,
+      urlEndpoint: import.meta.env.IMAGEKIT_URL_ENDPOINT,
+    });
+
+    const authParams = imagekit.getAuthenticationParameters();
+
+    return res.status(200).json(authParams);
+  } catch (error) {
+    return res.status(500).json({
+      error: "ImageKit auth failed",
+      message: error.message,
+    });
+  }
 }
