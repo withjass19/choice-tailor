@@ -1,32 +1,33 @@
-import crypto from 'node:crypto';
+// import crypto from "crypto";
 
-export default async function handler(request, response) {
-  const { fileName, fileType } = request.body || {};
+// export default function handler(req, res) {
+//   const token = crypto.randomUUID();
+//   const expire = Math.floor(Date.now() / 1000) + 60 * 5;
 
-  if (!fileName || !fileType) {
-    return response.status(400).json({ message: 'fileName and fileType are required.' });
-  }
+//   const privateKey = import.meta.env.VITE_IMAGEKIT_PRIVATE_KEY;
 
-  const imagekitPrivateKey = globalThis.process?.env?.IMAGEKIT_PRIVATE_KEY;
-  const imagekitPublicKey = globalThis.process?.env?.IMAGEKIT_PUBLIC_KEY;
-  const imagekitUrlEndpoint = globalThis.process?.env?.IMAGEKIT_URL_ENDPOINT;
+//   const signature = crypto
+//     .createHmac("sha1", privateKey)
+//     .update(token + expire)
+//     .digest("hex");
 
-  if (!imagekitPrivateKey || !imagekitPublicKey || !imagekitUrlEndpoint) {
-    return response.status(500).json({ message: 'ImageKit environment variables are not configured.' });
-  }
+//   res.status(200).json({
+//     token,
+//     expire,
+//     signature,
+//   });
+// }
+import ImageKit from "imagekit";
 
-  const token = crypto.randomBytes(16).toString('hex');
-  const expire = Math.floor(Date.now() / 1000) + 60 * 60;
-  const signature = crypto
-    .createHmac('sha1', imagekitPrivateKey)
-    .update(token + expire)
-    .digest('hex');
+const imagekit = new ImageKit({
+  publicKey: import.meta.env.IMAGEKIT_PUBLIC_KEY,
+  privateKey: import.meta.env.IMAGEKIT_PRIVATE_KEY,
+  urlEndpoint: import.meta.env.IMAGEKIT_URL_ENDPOINT,
+});
 
-  return response.status(200).json({
-    token,
-    expire,
-    signature,
-    publicKey: imagekitPublicKey,
-    urlEndpoint: imagekitUrlEndpoint,
-  });
+export default function handler(req, res) {
+  const authenticationParameters =
+    imagekit.getAuthenticationParameters();
+
+  res.status(200).json(authenticationParameters);
 }
