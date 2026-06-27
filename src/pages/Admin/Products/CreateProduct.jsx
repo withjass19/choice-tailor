@@ -89,15 +89,15 @@ export default function CreateProduct() {
   });
 
   const authenticator = async () => {
-  const res = await fetch("/api/imagekit-auth");
-  const text = await res.text();
+    const res = await fetch("/api/imagekit-auth");
+    const text = await res.text();
 
-  console.log("ImageKit auth raw response:", text);
+    console.log("ImageKit auth raw response:", text);
 
-  if (!res.ok) throw new Error("ImageKit auth failed");
+    if (!res.ok) throw new Error("ImageKit auth failed");
 
-  return JSON.parse(text);
-};
+    return JSON.parse(text);
+  };
 
   const onSubmit = async (formData) => {
     try {
@@ -110,7 +110,10 @@ export default function CreateProduct() {
       const uploadedImages = await Promise.all(
         files.map((file) =>
           upload({
-            ...authParams,
+            publicKey: import.meta.env.VITE_IMAGEKIT_PUBLIC_KEY,
+            signature: authParams.signature,
+            expire: authParams.expire,
+            token: authParams.token,
             file,
             fileName: `${Date.now()}-${file.name}`,
             folder: "/choice-tailor/products",
