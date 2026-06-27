@@ -113,12 +113,12 @@ export default function CreateProduct() {
       const uploadedImages = await Promise.all(
         files.map((file) =>
           upload({
-            publicKey: process.env.IMAGEKIT_PUBLIC_KEY,
+            file,
+            fileName: `${Date.now()}-${file.name}`,
+            publicKey: import.meta.env.VITE_IMAGEKIT_PUBLIC_KEY,
             signature: authParams.signature,
             expire: authParams.expire,
             token: authParams.token,
-            file,
-            fileName: `${Date.now()}-${file.name}`,
             folder: "/choice-tailor/products",
           }),
         ),
