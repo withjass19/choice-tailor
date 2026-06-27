@@ -2,23 +2,10 @@ import ImageKit from "imagekit";
 
 export default function handler(req, res) {
   try {
-    if (
-      !import.meta.env.VITE_IMAGEKIT_PUBLIC_KEY ||
-      !import.meta.env.VITE_IMAGEKIT_PRIVATE_KEY ||
-      !import.meta.env.VITE_IMAGEKIT_URL_ENDPOINT
-    ) {
-      return res.status(400).json({
-        error: "Missing ImageKit env variables",
-        hasPublicKey: !!import.meta.env.VITE_IMAGEKIT_PUBLIC_KEY,
-        hasPrivateKey: !!import.meta.env.VITE_IMAGEKIT_PRIVATE_KEY,
-        hasUrlEndpoint: !!import.meta.env.VITE_IMAGEKIT_URL_ENDPOINT,
-      });
-    }
-
     const imagekit = new ImageKit({
-      publicKey: import.meta.env.VITE_IMAGEKIT_PUBLIC_KEY,
-      privateKey: import.meta.env.VITE_IMAGEKIT_PRIVATE_KEY,
-      urlEndpoint: import.meta.env.VITE_IMAGEKIT_URL_ENDPOINT,
+      publicKey: process.env.IMAGEKIT_PUBLIC_KEY,
+      privateKey: process.env.IMAGEKIT_PRIVATE_KEY,
+      urlEndpoint: process.env.IMAGEKIT_URL_ENDPOINT,
     });
 
     const authParams = imagekit.getAuthenticationParameters();
