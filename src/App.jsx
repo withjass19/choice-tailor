@@ -28,6 +28,9 @@ import Inventory from "./pages/Admin/Inventory/Inventory";
 import ProtectedRoute from "./routes/ProtectedRoute";
 import AdminRoute from "./routes/AdminRoute";
 import Contact from "./pages/Contact/Contact";
+import EditProduct from "./pages/Admin/Products/EditProduct";
+import ViewProduct from "./pages/Admin/Products/ViewProduct";
+// import ViewProduct fro./pages/Admin/Products/ViewProductuct";
 // import Contact from "./pages/Contact/Contact";
 
 export default function App() {
@@ -75,6 +78,8 @@ export default function App() {
         <Route path="products" >
           <Route index element={<AdminProducts />}/>
           <Route path="add-new-product" element={<CreateProduct/>} />
+          <Route path=":id/edit" element={<EditProduct/>} />
+          <Route path=":id/view" element={<ViewProduct />} />
         </Route>
 
         <Route path="customers" element={<Customers />} />
