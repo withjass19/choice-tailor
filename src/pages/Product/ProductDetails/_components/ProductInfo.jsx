@@ -1,75 +1,69 @@
-import {
-  Heart,
-  Minus,
-  Plus,
-  ShoppingCart,
-} from "lucide-react";
+import { useState } from "react";
+import { Heart, Minus, Plus, ShoppingCart } from "lucide-react";
 
-export default function ProductInfo() {
+export default function ProductInfo({ product }) {
+  const [quantity, setQuantity] = useState(1);
+
   return (
     <div>
-      <span className="bg-[#f4ebd4] text-[#b89b3c] px-3 py-1 rounded">
-        IAF UNIFORMS
+      <span className="rounded bg-[#f4ebd4] px-3 py-1 text-[#b89b3c]">
+        {product?.category || "PRODUCT"}
       </span>
 
-      <h1 className="mt-4 text-5xl font-serif font-bold">
-        IAF Working Shirt
-        <br />
-        (Half Sleeve)
+      <h1 className="mt-4 font-serif text-5xl font-bold">
+        {product?.product_name}
       </h1>
 
       <div className="mt-6 flex gap-8">
-        <span>✓ Custom Fit</span>
-        <span>✓ Made to Order</span>
+        <span>✓ {product?.measurement_required ? "Custom Fit" : "Standard Size"}</span>
+        <span>✓ {product?.allow_custom_notes ? "Made to Order" : "Ready Product"}</span>
       </div>
 
       <h2 className="mt-6 text-5xl font-bold">
-        ₹1,450
+        ₹{Number(product?.price || 0).toLocaleString("en-IN")}
       </h2>
 
-      <p className="text-sm text-gray-500">
-        Inclusive of all taxes
-      </p>
+      <p className="text-sm text-gray-500">Inclusive of all taxes</p>
 
-      {/* Size Option */}
+      <h3 className="mt-8 font-bold">Select Size Option</h3>
 
-      <h3 className="mt-8 font-bold">
-        Select Size Option
-      </h3>
+      <div className="mt-3 grid grid-cols-2 gap-4">
+        {product?.measurement_required && (
+          <button className="rounded-lg bg-[#061735] p-4 text-white">
+            Custom Measurement
+          </button>
+        )}
 
-      <div className="grid grid-cols-2 gap-4 mt-3">
-        <button className="bg-[#061735] text-white p-4 rounded-lg">
-          Custom Measurement
-        </button>
-
-        <button className="border p-4 rounded-lg">
-          Standard Size
-        </button>
+        <button className="rounded-lg border p-4">Standard Size</button>
       </div>
 
-      {/* Quantity */}
-
       <div className="mt-8 flex items-center gap-4">
-        <button className="border p-2">
+        <button
+          type="button"
+          onClick={() => setQuantity((prev) => Math.max(1, prev - 1))}
+          className="border p-2"
+        >
           <Minus />
         </button>
 
-        <span>1</span>
+        <span>{quantity}</span>
 
-        <button className="border p-2">
+        <button
+          type="button"
+          onClick={() => setQuantity((prev) => prev + 1)}
+          className="border p-2"
+        >
           <Plus />
         </button>
       </div>
 
-      {/* Buttons */}
-
       <div className="mt-8 grid grid-cols-2 gap-4">
-        <button className="bg-[#b89b3c] text-white py-4 rounded-lg flex justify-center gap-2">
+        <button className="flex justify-center gap-2 rounded-lg bg-[#b89b3c] py-4 text-white">
           <ShoppingCart />
           Add to Cart
         </button>
 
-        <button className="border py-4 rounded-lg flex justify-center gap-2">
+        <button className="flex justify-center gap-2 rounded-lg border py-4">
           <Heart />
           Save for Later
         </button>

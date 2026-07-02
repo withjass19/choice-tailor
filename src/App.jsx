@@ -47,7 +47,8 @@ export default function App() {
         
         {/* <Route path="/contact" element={<Contact />} /> */}
         {/* <Route path="/track-order" element={<TrackOrder />} /> */}
-        <Route path="/product" element={<ProductDetails />} />
+        {/* <Route path="/product" element={<ProductDetails />} /> */}
+        <Route path="/product/:id" element={<ProductDetails />} />
         <Route path="/measurement-guide" element={<MeasurementGuide />} />
         {/* <Route path="/dashboard" element={<Dashboard/>}/> */}
 

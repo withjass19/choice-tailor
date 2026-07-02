@@ -1,31 +1,32 @@
+import { useState } from "react";
 import { ShirtModel } from "@/assets/images";
 
-export default function ProductGallery() {
+export default function ProductGallery({ product }) {
+  const images = product?.images?.length ? product.images : [ShirtModel];
+  const [activeImage, setActiveImage] = useState(images[0]);
+
   return (
     <div className="flex gap-4">
-
-      {/* Thumbnails */}
-      <div className="hidden md:flex flex-col gap-4">
-        {[1, 2, 3, 4].map((item) => (
-          <div
-            key={item}
-            className="w-20 h-20 border rounded-lg p-2 cursor-pointer"
+      <div className="hidden flex-col gap-4 md:flex">
+        {images.map((image, index) => (
+          <button
+            key={index}
+            type="button"
+            onClick={() => setActiveImage(image)}
+            className={`h-20 w-20 cursor-pointer rounded-lg border p-2 ${
+              activeImage === image ? "border-[#b89b3c]" : ""
+            }`}
           >
-            <img
-              src={ShirtModel}
-              alt=""
-              className="w-full h-full object-contain"
-            />
-          </div>
+            <img src={image} alt="" className="h-full w-full object-contain" />
+          </button>
         ))}
       </div>
 
-      {/* Main Image */}
-      <div className="flex-1 border rounded-xl bg-gray-50 p-8">
+      <div className="flex-1 rounded-xl border bg-gray-50 p-8">
         <img
-          src={ShirtModel}
-          alt=""
-          className="w-full h-[600px] object-contain"
+          src={activeImage}
+          alt={product?.product_name || "Product"}
+          className="h-[600px] w-full object-contain"
         />
       </div>
     </div>
