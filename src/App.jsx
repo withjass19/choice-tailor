@@ -32,7 +32,7 @@ import EditProduct from "./pages/Admin/Products/EditProduct";
 import ViewProduct from "./pages/Admin/Products/ViewProduct";
 // import ViewProduct fro./pages/Admin/Products/ViewProductuct";
 // import Contact from "./pages/Contact/Contact";
-import Addresses from "./pages/Dashboard/_components/Addresses/Addresses";
+import Addresses from "./pages/Dashboard/Addresses/Addresses";
 
 export default function App() {
   return (
