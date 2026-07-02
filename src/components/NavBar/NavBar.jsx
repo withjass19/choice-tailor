@@ -1,52 +1,60 @@
 import { useState } from "react";
-import { Menu, X, ChevronDown } from "lucide-react";
+import { Menu, X, ChevronDown, ShoppingCart } from "lucide-react";
 import { logo } from "../../assets/images";
 import { Link, useNavigate } from "react-router-dom";
+
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+
 import { useAuth } from "@/hooks/useAuth";
 import UserDropdown from "../_customComponents/UserDropdown/UserDropdown";
 
 export default function NavBar() {
   const [isOpen, setIsOpen] = useState(false);
   const navigation = useNavigate();
-   const { user, profile, isAuthenticated, logoutUser } = useAuth();
+
+  const { user, profile, isAuthenticated, logoutUser } = useAuth();
+
+  // Abhi temporary hai. Baad me cart context / Supabase se aayega.
+  const cartCount = 0;
 
   const login = () => {
-    navigation("/login")
-  }
+    navigation("/login");
+  };
+
+  const closeMobileMenu = () => {
+    setIsOpen(false);
+  };
 
   return (
     <nav className="w-full border-b bg-white">
-      <div className="w-[90%] mx-auto flex items-center justify-between py-4">
-        {/* Logo */}
+      <div className="mx-auto flex w-[90%] items-center justify-between py-4">
         <Link
           to="/"
-          className="flex flex-row items-center gap-3 cursor-pointer"
+          className="flex cursor-pointer flex-row items-center gap-3"
         >
           <img
             src={logo}
             alt="Choice Tailor"
-            className="w-12 h-12 object-contain"
+            className="h-12 w-12 object-contain"
           />
 
           <div>
-            <h2 className="text-lg md:text-xl font-bold">CHOICE TAILOR</h2>
+            <h2 className="text-lg font-bold md:text-xl">CHOICE TAILOR</h2>
             <p className="text-xs text-gray-600">
               Perfect Fit for Every Mission
             </p>
           </div>
         </Link>
 
-        {/* Desktop Menu */}
-        <div className="hidden lg:flex items-center gap-8 font-medium">
+        <div className="hidden items-center gap-8 font-medium lg:flex">
           <Link to="/">Home</Link>
           <Link to="/shop">Shop</Link>
-           {/* Uniform Dropdown */}
+
           <DropdownMenu>
             <DropdownMenuTrigger className="flex items-center gap-1 outline-none hover:text-[#b89b3c]">
               Uniforms
@@ -55,105 +63,143 @@ export default function NavBar() {
 
             <DropdownMenuContent align="start" className="w-52">
               <DropdownMenuItem asChild>
-                <Link to="/shop">
-                  Service Uniform
-                </Link>
+                <Link to="/shop">Service Uniform</Link>
               </DropdownMenuItem>
 
               <DropdownMenuItem asChild>
-                <Link to="/shop">
-                  Flying Overall
-                </Link>
+                <Link to="/shop">Flying Overall</Link>
               </DropdownMenuItem>
 
               <DropdownMenuItem asChild>
-                <Link to="/shop">
-                  Combat Uniform
-                </Link>
+                <Link to="/shop">Combat Uniform</Link>
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
-          {/* <Link to="/">Uniform</Link> */}
-          {/* <Link to="/">Accessories</Link> */}
-          {/* <Link to="/">Measurement Guide</Link> */}
+
           <Link to="/">Track Order</Link>
           <Link to="/about">About</Link>
           <Link to="/contact">Contact Us</Link>
         </div>
 
-        {/* Desktop Buttons */}
-        <div className="hidden lg:flex items-center gap-4">
-          {/* <button onClick={login} className="border border-gray-300 px-6 py-2 rounded-lg">
-            Login
-          </button> */}
-          {isAuthenticated ? <UserDropdown
-          user={user}
-          profile={profile}
-          logoutUser={logoutUser}
-        /> : (<button onClick={login} className="border border-gray-300 px-6 py-2 rounded-lg">
-            Login
-          </button>
+        <div className="hidden items-center gap-4 lg:flex">
+          {isAuthenticated ? (
+            <UserDropdown
+              user={user}
+              profile={profile}
+              logoutUser={logoutUser}
+            />
+          ) : (
+            <button
+              onClick={login}
+              className="rounded-lg border border-gray-300 px-6 py-2"
+            >
+              Login
+            </button>
           )}
 
-          <button className="bg-[#b89b3c] text-white px-6 py-2 rounded-lg">
-            Order Now
-          </button>
+          <Link
+            to="/cart"
+            className="relative flex items-center gap-2 rounded-lg bg-[#061735] px-5 py-2 text-white transition hover:bg-[#0b2758]"
+          >
+            <ShoppingCart size={20} />
+            <span className="font-medium">Cart</span>
+
+            {cartCount > 0 && (
+              <span className="absolute -right-2 -top-2 flex h-6 w-6 items-center justify-center rounded-full bg-[#b89b3c] text-xs font-bold text-white">
+                {cartCount}
+              </span>
+            )}
+          </Link>
         </div>
 
-        {/* Mobile Menu Button */}
         <button className="lg:hidden" onClick={() => setIsOpen(!isOpen)}>
           {isOpen ? <X size={28} /> : <Menu size={28} />}
         </button>
       </div>
 
-      {/* Mobile Menu */}
       {isOpen && (
-        <div className="lg:hidden border-t bg-white">
-          <div className="w-[90%] mx-auto flex flex-col py-4 gap-4">
-            <Link to="/">Home</Link>
-            <Link to="/shop">Shop</Link>
-             {/* Uniform Dropdown */}
-          <DropdownMenu>
-            <DropdownMenuTrigger className="flex items-center gap-1 outline-none hover:text-[#b89b3c]">
-              Uniforms
-              <ChevronDown size={16} />
-            </DropdownMenuTrigger>
+        <div className="border-t bg-white lg:hidden">
+          <div className="mx-auto flex w-[90%] flex-col gap-4 py-4">
+            <Link to="/" onClick={closeMobileMenu}>
+              Home
+            </Link>
 
-            <DropdownMenuContent align="start" className="w-52">
-              <DropdownMenuItem asChild>
-                <Link to="/shop">
-                  Service Uniform
-                </Link>
-              </DropdownMenuItem>
+            <Link to="/shop" onClick={closeMobileMenu}>
+              Shop
+            </Link>
 
-              <DropdownMenuItem asChild>
-                <Link to="/shop">
-                  Flying Overall
-                </Link>
-              </DropdownMenuItem>
+            <DropdownMenu>
+              <DropdownMenuTrigger className="flex items-center gap-1 outline-none hover:text-[#b89b3c]">
+                Uniforms
+                <ChevronDown size={16} />
+              </DropdownMenuTrigger>
 
-              <DropdownMenuItem asChild>
-                <Link to="/shop">
-                  Combat Uniform
-                </Link>
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-            {/* <Link to="/">Uniform</Link> */}
-            {/* <Link to="/">Accessories</Link> */}
-            {/* <Link to="/">Measurement Guide</Link> */}
-            <Link to="/">Track Order</Link>
-            <Link to="/about">About</Link>
-            <Link to="/contact">Contact Us</Link>
+              <DropdownMenuContent align="start" className="w-52">
+                <DropdownMenuItem asChild>
+                  <Link to="/shop" onClick={closeMobileMenu}>
+                    Service Uniform
+                  </Link>
+                </DropdownMenuItem>
+
+                <DropdownMenuItem asChild>
+                  <Link to="/shop" onClick={closeMobileMenu}>
+                    Flying Overall
+                  </Link>
+                </DropdownMenuItem>
+
+                <DropdownMenuItem asChild>
+                  <Link to="/shop" onClick={closeMobileMenu}>
+                    Combat Uniform
+                  </Link>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+
+            <Link to="/" onClick={closeMobileMenu}>
+              Track Order
+            </Link>
+
+            <Link to="/about" onClick={closeMobileMenu}>
+              About
+            </Link>
+
+            <Link to="/contact" onClick={closeMobileMenu}>
+              Contact Us
+            </Link>
 
             <div className="flex flex-col gap-3 pt-4">
-              <button onClick={login} className="border border-gray-300 py-2 rounded-lg">
-                Login
-              </button>
+              {isAuthenticated ? (
+                <UserDropdown
+                  user={user}
+                  profile={profile}
+                  logoutUser={logoutUser}
+                />
+              ) : (
+                <button
+                  onClick={() => {
+                    login();
+                    closeMobileMenu();
+                  }}
+                  className="rounded-lg border border-gray-300 py-2"
+                >
+                  Login
+                </button>
+              )}
 
-              <button className="bg-[#b89b3c] text-white py-2 rounded-lg">
-                Order Now
-              </button>
+              <Link
+                to="/cart"
+                onClick={closeMobileMenu}
+                className="relative flex items-center justify-center gap-2 rounded-lg bg-[#061735] py-2 text-white"
+              >
+                <ShoppingCart size={20} />
+                Cart
+
+                {cartCount > 0 && (
+                  <span className="absolute right-3 flex h-6 w-6 items-center justify-center rounded-full bg-[#b89b3c] text-xs font-bold text-white">
+                    {cartCount}
+                  </span>
+                )}
+              </Link>
             </div>
           </div>
         </div>
