@@ -1,15 +1,16 @@
 import { useState } from "react";
-import { Menu, X, ChevronDown, ShoppingCart } from "lucide-react";
+import { Menu, X, ShoppingCart } from "lucide-react";
+// import { ChevronDown } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 
 import { logo } from "../../assets/images";
 
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+// import {
+//   DropdownMenu,
+//   DropdownMenuContent,
+//   DropdownMenuItem,
+//   DropdownMenuTrigger,
+// } from "@/components/ui/dropdown-menu";
 
 import { useAuth } from "@/hooks/useAuth";
 import { useCart } from "@/hooks/useCart";
@@ -62,7 +63,7 @@ export default function NavBar() {
             <Link to="/">Home</Link>
             <Link to="/shop">Shop</Link>
 
-            <DropdownMenu>
+            {/* <DropdownMenu>
               <DropdownMenuTrigger className="flex items-center gap-1 outline-none hover:text-[#b89b3c]">
                 Uniforms
                 <ChevronDown size={16} />
@@ -81,7 +82,7 @@ export default function NavBar() {
                   <Link to="/shop">Combat Uniform</Link>
                 </DropdownMenuItem>
               </DropdownMenuContent>
-            </DropdownMenu>
+            </DropdownMenu> */}
 
             <Link to="/">Track Order</Link>
             <Link to="/about">About</Link>
@@ -140,7 +141,7 @@ export default function NavBar() {
                 Shop
               </Link>
 
-              <DropdownMenu>
+              {/* <DropdownMenu>
                 <DropdownMenuTrigger className="flex items-center gap-1 outline-none hover:text-[#b89b3c]">
                   Uniforms
                   <ChevronDown size={16} />
@@ -165,7 +166,7 @@ export default function NavBar() {
                     </Link>
                   </DropdownMenuItem>
                 </DropdownMenuContent>
-              </DropdownMenu>
+              </DropdownMenu> */}
 
               <Link to="/" onClick={closeMobileMenu}>
                 Track Order
