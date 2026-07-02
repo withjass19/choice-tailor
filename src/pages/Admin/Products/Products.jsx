@@ -439,13 +439,13 @@ export default function AdminProducts() {
                         </button>
 
                         <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <button
+                          <DropdownMenuTrigger className="rounded-lg border p-2 hover:bg-gray-50">
+                            {/* <button
                               type="button"
-                              className="rounded-lg border p-2 hover:bg-gray-50"
-                            >
+                              
+                            > */}
                               <MoreVertical size={17} />
-                            </button>
+                            {/* </button> */}
                           </DropdownMenuTrigger>
 
                           <DropdownMenuContent align="end" className="w-52">

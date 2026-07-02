@@ -15,6 +15,13 @@ export function AuthProvider({ children }) {
       .eq("id", userId)
       .single();
 
+    
+
+// setCustomers(data || []);
+
+    // console.log("Profile fetch result:", { data, error });
+    // console.log("All profiles:", Alldata);
+
     if (error) {
       setProfile(null);
       return null;
