@@ -2,6 +2,7 @@ import { Outlet } from "react-router-dom";
 import Footer from "../components/Footer/Footer";
 import TopBar from "@/components/TopBar/TopBar";
 import NavBar from "@/components/NavBar/NavBar";
+import { Toaster } from "@/components/ui/sonner";
 
 
 export default function MainLayout() {
@@ -9,6 +10,7 @@ export default function MainLayout() {
     <>
       <TopBar />
       <NavBar/>
+      <Toaster richColors position="top-center" />
       <main>
         <Outlet />
       </main>

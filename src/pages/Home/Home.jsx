@@ -11,36 +11,34 @@ import { supabase } from "@/lib/supabase";
 
 export default function Home() {
   const [popularProducts, setPopularProducts] = useState([]);
-  
-  
 
-useEffect(() => {
-  const fetchPopularProducts = async () => {
-  const { data } = await supabase
-    .from("products")
-    .select("*")
-    .eq("status", "Active")
-    // .eq("featured_product", true)
-    .limit(12);
+  useEffect(() => {
+    const fetchPopularProducts = async () => {
+      const { data } = await supabase
+        .from("products")
+        .select("*")
+        .eq("status", "Active")
+        // .eq("featured_product", true)
+        .limit(12);
 
-    console.log("Popular Products:", data); // Log the fetched data for debugging
+      console.log("Popular Products:", data); // Log the fetched data for debugging
 
-  setPopularProducts(data || []);
-};
+      setPopularProducts(data || []);
+    };
 
-  fetchPopularProducts();
-}, []);
+    fetchPopularProducts();
+  }, []);
 
   return (
     <div className="w-[100%]">
-      <HeroSection/>
-      <Categories/>
-      <OrderSteps/>
+      <HeroSection />
+      <Categories />
+      <OrderSteps />
       <PopularItems products={popularProducts} />
-      <WhyChooseSection/>
-      <TestimonialsSection/>
-      <ImageUpload/>
+      <WhyChooseSection />
+      <TestimonialsSection />
+      <ImageUpload />
       {/* <Footer/> */}
     </div>
-  )
+  );
 }

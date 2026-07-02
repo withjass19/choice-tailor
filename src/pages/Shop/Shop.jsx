@@ -1,10 +1,12 @@
 import { useEffect, useMemo, useState } from "react";
 import { ShoppingCart, ChevronDown, Star } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { toast } from "sonner";
 
 import { ShirtModel, bgHero } from "@/assets/images";
 import Footer from "@/components/Footer/Footer";
 import { supabase } from "@/lib/supabase";
+import { useCart } from "@/hooks/useCart";
 
 const categories = [
   "All Products",
@@ -20,6 +22,7 @@ const categories = [
 
 export default function ShopPage() {
   const navigate = useNavigate();
+  const { addToCart } = useCart();
 
   const [products, setProducts] = useState([]);
   const [activeCategory, setActiveCategory] = useState("All Products");
@@ -28,6 +31,18 @@ export default function ShopPage() {
   const [madeToOrderOnly, setMadeToOrderOnly] = useState(false);
   const [sortBy, setSortBy] = useState("popular");
   const [loading, setLoading] = useState(true);
+
+  const handleAddToCart = (product) => {
+    addToCart({
+      id: product.id,
+      product_name: product.product_name,
+      category: product.category,
+      price: product.price,
+      images: product.images,
+    });
+
+    toast.success("Product added to cart");
+  };
 
   useEffect(() => {
     async function fetchProducts() {
@@ -105,12 +120,15 @@ export default function ShopPage() {
         <div className="relative mx-auto grid max-w-7xl items-center gap-10 px-4 py-16 text-white md:grid-cols-2 lg:px-8">
           <div>
             <h2 className="font-serif text-4xl font-bold leading-tight md:text-5xl">
-              Shop <span className="text-[#d4a52f]">Uniforms & Accessories</span>
+              Shop{" "}
+              <span className="text-[#d4a52f]">
+                Uniforms & Accessories
+              </span>
             </h2>
 
             <p className="mt-5 max-w-xl text-base leading-relaxed text-gray-200">
-              Premium IAF uniforms, custom stitching, caps, belts, badges,
-              name plates and essential accessories — delivered across India.
+              Premium IAF uniforms, custom stitching, caps, belts, badges, name
+              plates and essential accessories — delivered across India.
             </p>
 
             <div className="mt-8 flex flex-col gap-4 sm:flex-row">
@@ -169,7 +187,9 @@ export default function ShopPage() {
                   type="checkbox"
                   checked={activeCategory === item}
                   onChange={() =>
-                    setActiveCategory(activeCategory === item ? "All Products" : item)
+                    setActiveCategory(
+                      activeCategory === item ? "All Products" : item,
+                    )
                   }
                   className="h-4 w-4"
                 />
@@ -181,7 +201,9 @@ export default function ShopPage() {
           <div className="my-6 border-t" />
 
           <h3 className="font-bold">Price Range</h3>
-          <p className="mt-3 text-sm">₹0 - ₹{maxPrice.toLocaleString("en-IN")}</p>
+          <p className="mt-3 text-sm">
+            ₹0 - ₹{maxPrice.toLocaleString("en-IN")}
+          </p>
 
           <input
             type="range"
@@ -217,6 +239,7 @@ export default function ShopPage() {
           </div>
 
           <button
+            type="button"
             onClick={clearFilters}
             className="mt-6 w-full rounded-md border py-2 text-sm font-semibold"
           >
@@ -232,7 +255,10 @@ export default function ShopPage() {
                 : `Showing ${filteredProducts.length} of ${products.length} products`}
             </p>
 
-            <button className="flex w-fit items-center gap-2 rounded-md border px-4 py-2 text-sm">
+            <button
+              type="button"
+              className="flex w-fit items-center gap-2 rounded-md border px-4 py-2 text-sm"
+            >
               <select
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value)}
@@ -299,7 +325,11 @@ export default function ShopPage() {
                       ))}
                     </div>
 
-                    <button className="rounded-md border p-2 transition hover:bg-[#061735] hover:text-white">
+                    <button
+                      type="button"
+                      onClick={() => handleAddToCart(item)}
+                      className="rounded-md border p-2 transition hover:bg-[#061735] hover:text-white"
+                    >
                       <ShoppingCart size={18} />
                     </button>
                   </div>
@@ -323,11 +353,15 @@ export default function ShopPage() {
                   Need a Custom Fit Uniform?
                 </h2>
                 <p className="mt-2 text-sm text-gray-300">
-                  Create your measurement profile once and use it for every future order.
+                  Create your measurement profile once and use it for every
+                  future order.
                 </p>
               </div>
 
-              <button className="rounded-md bg-[#b89b3c] px-5 py-3 text-sm font-bold">
+              <button
+                type="button"
+                className="rounded-md bg-[#b89b3c] px-5 py-3 text-sm font-bold"
+              >
                 Create Measurement Profile →
               </button>
             </div>
