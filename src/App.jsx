@@ -14,7 +14,7 @@ import Dashboard from "./pages/Dashboard/Dashboard";
 import DashboardLayout from "./pages/Dashboard/DashboardLayout";
 import MeasurementProfiles from "./pages/Dashboard/MeasurementProfile/MeasurementProfile";
 import Orders from "./pages/Dashboard/_components/Orders";
-import Addresses from "./pages/Dashboard/_components/Addresses";
+// import Addresses from "./pages/Dashboard/_components/Addresses";
 import ProfileSettings from "./pages/Dashboard/_components/ProfileSettings";
 import AdminLayout from "./layouts/AdminLayout";
 import AdminDashboard from "./pages/Admin/Dashboard/Dashboard";
@@ -32,6 +32,7 @@ import EditProduct from "./pages/Admin/Products/EditProduct";
 import ViewProduct from "./pages/Admin/Products/ViewProduct";
 // import ViewProduct fro./pages/Admin/Products/ViewProductuct";
 // import Contact from "./pages/Contact/Contact";
+import Addresses from "./pages/Dashboard/_components/Addresses/Addresses";
 
 export default function App() {
   return (
@@ -60,7 +61,7 @@ export default function App() {
           <Route index element={<Dashboard />} />
           <Route path="measurements" element={<MeasurementProfiles />} />
           <Route path="orders" element={<Orders />} />
-          <Route path="addresses" element={<Addresses />} />
+          <Route path="addresses" element={<Addresses/>} />
           <Route path="profile" element={<ProfileSettings />} />
         </Route>
       </Route>

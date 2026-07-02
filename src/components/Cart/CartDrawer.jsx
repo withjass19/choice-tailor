@@ -1,5 +1,6 @@
 import { Minus, Plus, Trash2, ShoppingCart } from "lucide-react";
 import { toast } from "sonner";
+import { useNavigate } from "react-router-dom";
 
 import {
   Sheet,
@@ -9,6 +10,8 @@ import {
 } from "@/components/ui/sheet";
 
 import { useCart } from "@/hooks/useCart";
+import { useAuth } from "@/hooks/useAuth";
+import { supabase } from "@/lib/supabase";
 
 const loadRazorpayScript = () => {
   return new Promise((resolve) => {
@@ -28,6 +31,9 @@ const loadRazorpayScript = () => {
 };
 
 export default function CartDrawer() {
+  const navigate = useNavigate();
+  const { user, isAuthenticated } = useAuth();
+
   const {
     cartItems,
     cartOpen,
@@ -35,6 +41,7 @@ export default function CartDrawer() {
     increaseQuantity,
     decreaseQuantity,
     removeFromCart,
+    clearCart,
     subtotal,
   } = useCart();
 
@@ -42,6 +49,28 @@ export default function CartDrawer() {
     try {
       if (cartItems.length === 0) {
         toast.error("Your cart is empty.");
+        return;
+      }
+
+      if (!isAuthenticated || !user) {
+        toast.error("Please login to checkout.");
+        setCartOpen(false);
+        navigate("/login");
+        return;
+      }
+
+      const { data: addresses, error: addressError } = await supabase
+        .from("addresses")
+        .select("id")
+        .eq("user_id", user.id)
+        .limit(1);
+
+      if (addressError) throw addressError;
+
+      if (!addresses || addresses.length === 0) {
+        toast.error("Please add delivery address first.");
+        setCartOpen(false);
+        navigate("/dashboard/addresses");
         return;
       }
 
@@ -76,6 +105,21 @@ export default function CartDrawer() {
         description: "Uniform Order Payment",
         order_id: order.id,
 
+        prefill: {
+          name: user.user_metadata?.full_name || "",
+          email: user.email || "",
+          contact: "",
+        },
+
+        notes: {
+          brand: "Choice Tailor",
+          user_id: user.id,
+        },
+
+        theme: {
+          color: "#061735",
+        },
+
         handler: async function (response) {
           const verifyRes = await fetch("/api/verify-razorpay-payment", {
             method: "POST",
@@ -97,20 +141,10 @@ export default function CartDrawer() {
 
           console.log("Payment Response:", response);
           console.log("Cart Items:", cartItems);
-        },
 
-        prefill: {
-          name: "",
-          email: "",
-          contact: "",
-        },
+          clearCart();
 
-        notes: {
-          brand: "Choice Tailor",
-        },
-
-        theme: {
-          color: "#061735",
+          // navigate("/order-success");
         },
       };
 
