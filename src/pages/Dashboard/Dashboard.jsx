@@ -1,7 +1,9 @@
 import DashboardBanner from "./_components/DashboardBanner";
 import StatsCards from "./_components/StatsCards";
-import MeasurementProfiles from "./_components/MeasurmentProfiles";
-import RecentOrders from "./_components/RecentOrders";
+// import MeasurementProfiles from "./_components/MeasurmentProfiles";
+import MeasurementProfiles from "./MeasurementProfiles/MeasurementProfiles";
+// import RecentOrders from "./_components/RecentOrders";
+import RecentOrders from "./Orders/Orders";
 import QuickActions from "./_components/QuickActions";
 
 export default function Dashboard() {

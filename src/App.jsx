@@ -13,7 +13,7 @@ import Registeration from "./pages/Registration/Registration";
 import Dashboard from "./pages/Dashboard/Dashboard";
 import DashboardLayout from "./pages/Dashboard/DashboardLayout";
 // import MeasurementProfiles from "./pages/Dashboard/MeasurementProfile/MeasurementProfile";
-import Orders from "./pages/Dashboard/_components/Orders";
+// import Orders from "./pages/Dashboard/_components/Orders";
 // import Addresses from "./pages/Dashboard/_components/Addresses";
 import ProfileSettings from "./pages/Dashboard/_components/ProfileSettings";
 import AdminLayout from "./layouts/AdminLayout";
@@ -34,6 +34,7 @@ import ViewProduct from "./pages/Admin/Products/ViewProduct";
 // import Contact from "./pages/Contact/Contact";
 import Addresses from "./pages/Dashboard/Addresses/Addresses";
 import MeasurementProfiles from "./pages/Dashboard/MeasurementProfiles/MeasurementProfiles";
+import Orders from "./pages/Dashboard/Orders/Orders";
 
 export default function App() {
   return (
