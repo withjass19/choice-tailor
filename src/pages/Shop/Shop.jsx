@@ -4,7 +4,6 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 
 import { ShirtModel, bgHero } from "@/assets/images";
-import Footer from "@/components/Footer/Footer";
 import { supabase } from "@/lib/supabase";
 import { useCart } from "@/hooks/useCart";
 
@@ -379,8 +378,6 @@ export default function ShopPage() {
           </div>
         </section>
       </main>
-
-      <Footer />
     </div>
   );
 }
