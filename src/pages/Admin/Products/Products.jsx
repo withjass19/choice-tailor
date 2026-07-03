@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   Search,
   Filter,
@@ -20,9 +20,13 @@ import {
   Copy,
   Trash2,
   Archive,
+  RotateCcw,
+  FileDown,
+  CalendarDays,
 } from "lucide-react";
 
 import { useNavigate } from "react-router-dom";
+import { toast } from "sonner";
 import { supabase } from "@/lib/supabase";
 
 import {
@@ -33,27 +37,43 @@ import {
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
 
+import ExportProductsDialog from "./_components/ExportProductsDialog";
+
 export default function AdminProducts() {
   const navigate = useNavigate();
+
   const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  const [search, setSearch] = useState("");
+  const [categoryFilter, setCategoryFilter] = useState("all");
+  const [statusFilter, setStatusFilter] = useState("all");
+  const [measurementFilter, setMeasurementFilter] = useState("all");
+  const [stockFilter, setStockFilter] = useState("all");
+  const [exportOpen, setExportOpen] = useState(false);
 
   useEffect(() => {
     let ignore = false;
 
     async function loadProducts() {
-      const { data, error } = await supabase
-        .from("products")
-        .select("*")
-        .order("created_at", { ascending: false });
+      try {
+        setLoading(true);
 
-      if (ignore) return;
+        const { data, error } = await supabase
+          .from("products")
+          .select("*")
+          .order("created_at", { ascending: false });
 
-      if (error) {
+        if (ignore) return;
+        if (error) throw error;
+
+        setProducts(data || []);
+      } catch (error) {
         console.error("Products fetch error:", error);
-        return;
+        toast.error("Failed to load products.");
+      } finally {
+        if (!ignore) setLoading(false);
       }
-
-      setProducts(data ?? []);
     }
 
     loadProducts();
@@ -71,10 +91,175 @@ export default function AdminProducts() {
 
     if (error) {
       console.error("Products refresh error:", error);
+      toast.error("Failed to refresh products.");
       return;
     }
 
-    setProducts(data ?? []);
+    setProducts(data || []);
+  };
+
+  const categories = useMemo(() => {
+    return [...new Set(products.map((p) => p.category).filter(Boolean))];
+  }, [products]);
+
+  const getStockStatus = (product) => {
+    const stock = Number(product.stock_quantity || 0);
+    const alert = Number(product.low_stock_alert || 5);
+
+    if (stock === 0 || product.status === "Out of Stock") return "out";
+    if (stock > 0 && stock <= alert) return "low";
+    return "in";
+  };
+
+  const filteredProducts = useMemo(() => {
+    let result = [...products];
+
+    if (search.trim()) {
+      const keyword = search.toLowerCase();
+
+      result = result.filter((product) => {
+        return (
+          product.product_name?.toLowerCase().includes(keyword) ||
+          product.sku?.toLowerCase().includes(keyword) ||
+          product.category?.toLowerCase().includes(keyword)
+        );
+      });
+    }
+
+    if (categoryFilter !== "all") {
+      result = result.filter((p) => p.category === categoryFilter);
+    }
+
+    if (statusFilter !== "all") {
+      result = result.filter((p) => p.status === statusFilter);
+    }
+
+    if (measurementFilter !== "all") {
+      result = result.filter((p) =>
+        measurementFilter === "required"
+          ? p.measurement_required === true
+          : p.measurement_required === false,
+      );
+    }
+
+    if (stockFilter !== "all") {
+      result = result.filter((p) => getStockStatus(p) === stockFilter);
+    }
+
+    return result;
+  }, [
+    products,
+    search,
+    categoryFilter,
+    statusFilter,
+    measurementFilter,
+    stockFilter,
+  ]);
+
+  const getExportDateRange = (type) => {
+    const now = new Date();
+    const start = new Date();
+
+    if (type === "today") start.setHours(0, 0, 0, 0);
+    if (type === "week") start.setDate(now.getDate() - 7);
+    if (type === "month") start.setMonth(now.getMonth() - 1);
+    if (type === "three_months") start.setMonth(now.getMonth() - 3);
+    if (type === "year") start.setFullYear(now.getFullYear() - 1);
+
+    return { start, end: now };
+  };
+
+  const filterByDate = (data, dateRange, customRange) => {
+    if (dateRange === "all") return data;
+
+    let start;
+    let end;
+
+    if (dateRange === "custom") {
+      start = new Date(customRange.start);
+      end = new Date(customRange.end);
+      end.setHours(23, 59, 59, 999);
+    } else {
+      const range = getExportDateRange(dateRange);
+      start = range.start;
+      end = range.end;
+    }
+
+    return data.filter((product) => {
+      if (!product.created_at) return false;
+
+      const createdAt = new Date(product.created_at);
+      return createdAt >= start && createdAt <= end;
+    });
+  };
+
+  const exportProducts = (
+    type = "filtered",
+    dateRange = "all",
+    customRange = null,
+  ) => {
+    let exportData = [];
+
+    if (type === "all") {
+      exportData = products;
+    } else if (type === "low_stock") {
+      exportData = products.filter((p) => getStockStatus(p) === "low");
+    } else if (type === "out_of_stock") {
+      exportData = products.filter((p) => getStockStatus(p) === "out");
+    } else {
+      exportData = filteredProducts;
+    }
+
+    exportData = filterByDate(exportData, dateRange, customRange);
+
+    if (exportData.length === 0) {
+      toast.error("No products available to export.");
+      return;
+    }
+
+    const rows = exportData.map((product, index) => ({
+      sr_no: index + 1,
+      product_name: product.product_name || "",
+      sku: product.sku || "",
+      category: product.category || "",
+      sub_category: product.sub_category || "",
+      price: product.price || 0,
+      stock_quantity: product.stock_quantity || 0,
+      low_stock_alert: product.low_stock_alert || 0,
+      stock_status: getStockStatus(product),
+      measurement_required: product.measurement_required ? "Yes" : "No",
+      status: product.status || "",
+      created_at: product.created_at
+        ? new Date(product.created_at).toLocaleString("en-IN")
+        : "",
+    }));
+
+    const headers = Object.keys(rows[0]);
+
+    const csv = [
+      headers.join(","),
+      ...rows.map((row) =>
+        headers
+          .map((header) => `"${String(row[header]).replaceAll('"', '""')}"`)
+          .join(","),
+      ),
+    ].join("\n");
+
+    const blob = new Blob(["\uFEFF" + csv], {
+      type: "text/csv;charset=utf-8;",
+    });
+
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    const today = new Date().toISOString().split("T")[0];
+
+    link.href = url;
+    link.download = `choice-tailor-${type}-${dateRange}-products-${today}.csv`;
+    link.click();
+
+    URL.revokeObjectURL(url);
+
+    toast.success(`${exportData.length} products exported.`);
   };
 
   const duplicateProduct = async (id) => {
@@ -87,32 +272,28 @@ export default function AdminProducts() {
 
       if (error) throw error;
 
-      const productWithoutAutoFields = { ...product };
+      const duplicate = { ...product };
 
-      delete productWithoutAutoFields.id;
-      delete productWithoutAutoFields.created_at;
-      delete productWithoutAutoFields.updated_at;
+      delete duplicate.id;
+      delete duplicate.created_at;
+      delete duplicate.updated_at;
 
-      const duplicate = {
-        ...productWithoutAutoFields,
+      const { error: insertError } = await supabase.from("products").insert({
+        ...duplicate,
         product_name: `${product.product_name} (Copy)`,
-        sku: `${product.sku}-COPY-${Date.now()}`,
+        sku: `${product.sku || "SKU"}-COPY-${Date.now()}`,
         status: "Draft",
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
-      };
-
-      const { error: insertError } = await supabase
-        .from("products")
-        .insert(duplicate);
+      });
 
       if (insertError) throw insertError;
 
       await refreshProducts();
-      alert("Product duplicated successfully.");
+      toast.success("Product duplicated successfully.");
     } catch (error) {
       console.error("Duplicate failed:", error);
-      alert("Failed to duplicate product.");
+      toast.error("Failed to duplicate product.");
     }
   };
 
@@ -127,6 +308,7 @@ export default function AdminProducts() {
 
     if (error) {
       console.error("Archive failed:", error);
+      toast.error("Failed to archive product.");
       return;
     }
 
@@ -135,6 +317,32 @@ export default function AdminProducts() {
         item.id === id ? { ...item, status: "Archived" } : item,
       ),
     );
+
+    toast.success("Product archived.");
+  };
+
+  const restoreProduct = async (id) => {
+    const { error } = await supabase
+      .from("products")
+      .update({
+        status: "Active",
+        updated_at: new Date().toISOString(),
+      })
+      .eq("id", id);
+
+    if (error) {
+      console.error("Restore failed:", error);
+      toast.error("Failed to restore product.");
+      return;
+    }
+
+    setProducts((prev) =>
+      prev.map((item) =>
+        item.id === id ? { ...item, status: "Active" } : item,
+      ),
+    );
+
+    toast.success("Product restored.");
   };
 
   const deleteProduct = async (id) => {
@@ -148,25 +356,19 @@ export default function AdminProducts() {
 
     if (error) {
       console.error("Delete failed:", error);
+      toast.error("Failed to delete product.");
       return;
     }
 
     setProducts((prev) => prev.filter((item) => item.id !== id));
+    toast.success("Product deleted.");
   };
 
   const totalProducts = products.length;
   const activeProducts = products.filter((p) => p.status === "Active").length;
-
-  const outOfStock = products.filter(
-    (p) => Number(p.stock_quantity) === 0 || p.status === "Out of Stock",
-  ).length;
-
-  const lowStock = products.filter(
-    (p) =>
-      Number(p.stock_quantity) > 0 &&
-      Number(p.stock_quantity) <= Number(p.low_stock_alert || 5),
-  ).length;
-
+  const archivedProducts = products.filter((p) => p.status === "Archived").length;
+  const outOfStock = products.filter((p) => getStockStatus(p) === "out").length;
+  const lowStock = products.filter((p) => getStockStatus(p) === "low").length;
   const draftProducts = products.filter((p) => p.status === "Draft").length;
 
   const stats = [
@@ -231,10 +433,73 @@ export default function AdminProducts() {
         </div>
 
         <div className="flex gap-3">
-          <button className="flex items-center gap-2 rounded-lg border bg-white px-5 py-3 text-sm font-semibold">
-            <Download size={17} />
-            Export Products
-          </button>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <button
+                type="button"
+                className="flex items-center gap-2 rounded-lg border bg-white px-5 py-3 text-sm font-semibold"
+              >
+                <Download size={17} />
+                Export Products
+                <ChevronDown size={15} />
+              </button>
+            </DropdownMenuTrigger>
+
+            <DropdownMenuContent align="end" className="w-64">
+              <DropdownMenuItem onClick={() => exportProducts("filtered", "all")}>
+                <FileDown className="mr-2 h-4 w-4" />
+                Export Filtered
+              </DropdownMenuItem>
+
+              <DropdownMenuItem onClick={() => exportProducts("all", "all")}>
+                <FileDown className="mr-2 h-4 w-4" />
+                Export All Products
+              </DropdownMenuItem>
+
+              <DropdownMenuSeparator />
+
+              <DropdownMenuItem onClick={() => exportProducts("filtered", "today")}>
+                <CalendarDays className="mr-2 h-4 w-4" />
+                Today
+              </DropdownMenuItem>
+
+              <DropdownMenuItem onClick={() => exportProducts("filtered", "week")}>
+                Last 7 Days
+              </DropdownMenuItem>
+
+              <DropdownMenuItem onClick={() => exportProducts("filtered", "month")}>
+                Last 30 Days
+              </DropdownMenuItem>
+
+              <DropdownMenuItem
+                onClick={() => exportProducts("filtered", "three_months")}
+              >
+                Last 3 Months
+              </DropdownMenuItem>
+
+              <DropdownMenuItem onClick={() => exportProducts("filtered", "year")}>
+                Last 1 Year
+              </DropdownMenuItem>
+
+              <DropdownMenuItem onClick={() => setExportOpen(true)}>
+                Custom Date Range
+              </DropdownMenuItem>
+
+              <DropdownMenuSeparator />
+
+              <DropdownMenuItem onClick={() => exportProducts("low_stock", "all")}>
+                <AlertTriangle className="mr-2 h-4 w-4" />
+                Low Stock
+              </DropdownMenuItem>
+
+              <DropdownMenuItem
+                onClick={() => exportProducts("out_of_stock", "all")}
+              >
+                <XCircle className="mr-2 h-4 w-4" />
+                Out of Stock
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
 
           <button
             type="button"
@@ -253,10 +518,7 @@ export default function AdminProducts() {
           const isUp = item.trend === "up";
 
           return (
-            <div
-              key={item.title}
-              className="rounded-xl border bg-white p-5 shadow-sm"
-            >
+            <div key={item.title} className="rounded-xl border bg-white p-5 shadow-sm">
               <div className="flex items-center gap-4">
                 <div
                   className={`flex h-12 w-12 items-center justify-center rounded-lg ${item.bg} ${item.color}`}
@@ -301,27 +563,80 @@ export default function AdminProducts() {
           />
 
           <input
+            value={search}
+            onChange={(event) => setSearch(event.target.value)}
             placeholder="Search by product name, SKU, category..."
             className="w-full rounded-lg border bg-white px-4 py-3 pr-11 text-sm outline-none"
           />
         </div>
 
-        <SelectBox label="All Categories" />
-        <SelectBox label="All Status" />
-        <SelectBox label="Measurement Required" />
-        <SelectBox label="All Stock Status" />
+        <select
+          value={categoryFilter}
+          onChange={(event) => setCategoryFilter(event.target.value)}
+          className="rounded-lg border bg-white px-4 py-3 text-sm outline-none"
+        >
+          <option value="all">All Categories</option>
+          {categories.map((category) => (
+            <option key={category} value={category}>
+              {category}
+            </option>
+          ))}
+        </select>
 
-        <button className="flex items-center justify-center gap-2 rounded-lg border bg-white px-5 py-3 text-sm font-semibold">
+        <select
+          value={statusFilter}
+          onChange={(event) => setStatusFilter(event.target.value)}
+          className="rounded-lg border bg-white px-4 py-3 text-sm outline-none"
+        >
+          <option value="all">All Status</option>
+          <option value="Active">Active</option>
+          <option value="Draft">Draft</option>
+          <option value="Archived">Archived</option>
+          <option value="Out of Stock">Out of Stock</option>
+        </select>
+
+        <select
+          value={measurementFilter}
+          onChange={(event) => setMeasurementFilter(event.target.value)}
+          className="rounded-lg border bg-white px-4 py-3 text-sm outline-none"
+        >
+          <option value="all">Measurement Required</option>
+          <option value="required">Required</option>
+          <option value="not_required">Not Required</option>
+        </select>
+
+        <select
+          value={stockFilter}
+          onChange={(event) => setStockFilter(event.target.value)}
+          className="rounded-lg border bg-white px-4 py-3 text-sm outline-none"
+        >
+          <option value="all">All Stock Status</option>
+          <option value="in">In Stock</option>
+          <option value="low">Low Stock</option>
+          <option value="out">Out of Stock</option>
+        </select>
+
+        <button
+          type="button"
+          onClick={() => {
+            setSearch("");
+            setCategoryFilter("all");
+            setStatusFilter("all");
+            setMeasurementFilter("all");
+            setStockFilter("all");
+          }}
+          className="flex items-center justify-center gap-2 rounded-lg border bg-white px-5 py-3 text-sm font-semibold"
+        >
           <Filter size={17} />
-          Filter
+          Reset
         </button>
 
         <div className="flex overflow-hidden rounded-lg border bg-white">
-          <button className="px-3">
+          <button type="button" className="px-3">
             <Grid3X3 size={18} />
           </button>
 
-          <button className="bg-[#061735] px-3 text-white">
+          <button type="button" className="bg-[#061735] px-3 text-white">
             <List size={18} />
           </button>
         </div>
@@ -345,189 +660,212 @@ export default function AdminProducts() {
             </thead>
 
             <tbody>
-              {products.map((item) => {
-                const stock = Number(item.stock_quantity || 0);
-                const lowStockAlert = Number(item.low_stock_alert || 5);
+              {loading ? (
+                <tr>
+                  <td colSpan={9} className="px-5 py-10 text-center text-gray-500">
+                    Loading products...
+                  </td>
+                </tr>
+              ) : filteredProducts.length === 0 ? (
+                <tr>
+                  <td colSpan={9} className="px-5 py-10 text-center text-gray-500">
+                    No products found.
+                  </td>
+                </tr>
+              ) : (
+                filteredProducts.map((item) => {
+                  const stock = Number(item.stock_quantity || 0);
+                  const stockStatus = getStockStatus(item);
 
-                const stockStatus =
-                  stock === 0
-                    ? "Out of Stock"
-                    : stock <= lowStockAlert
-                      ? "Low Stock"
-                      : "In Stock";
+                  const stockLabel = {
+                    in: "In Stock",
+                    low: "Low Stock",
+                    out: "Out of Stock",
+                  }[stockStatus];
 
-                return (
-                  <tr key={item.id} className="border-b last:border-b-0">
-                    <td className="px-5 py-4">
-                      <div className="flex items-center gap-4">
-                        <img
-                          src={item.images?.[0]}
-                          alt={item.product_name}
-                          className="h-14 w-14 rounded-lg object-cover"
-                        />
+                  return (
+                    <tr key={item.id} className="border-b last:border-b-0">
+                      <td className="px-5 py-4">
+                        <div className="flex items-center gap-4">
+                          <img
+                            src={item.images?.[0]}
+                            alt={item.product_name}
+                            className="h-14 w-14 rounded-lg object-cover"
+                          />
 
-                        <div>
-                          <p className="font-semibold text-[#061735]">
-                            {item.product_name}
-                          </p>
+                          <div>
+                            <p className="font-semibold text-[#061735]">
+                              {item.product_name}
+                            </p>
 
-                          <p className="text-xs text-gray-500">
-                            {item.short_description}
-                          </p>
+                            <p className="max-w-[260px] truncate text-xs text-gray-500">
+                              {item.short_description}
+                            </p>
+                          </div>
                         </div>
-                      </div>
-                    </td>
+                      </td>
 
-                    <td className="px-5 py-4 font-semibold">{item.sku}</td>
+                      <td className="px-5 py-4 font-semibold">{item.sku || "-"}</td>
 
-                    <td className="px-5 py-4">{item.category}</td>
+                      <td className="px-5 py-4">{item.category || "-"}</td>
 
-                    <td className="px-5 py-4 font-semibold">
-                      ₹{item.price}
-                    </td>
+                      <td className="px-5 py-4 font-semibold">
+                        ₹{Number(item.price || 0).toLocaleString("en-IN")}
+                      </td>
 
-                    <td className="px-5 py-4">
-                      <p className="font-semibold">{stock}</p>
+                      <td className="px-5 py-4">
+                        <p className="font-semibold">{stock}</p>
 
-                      <p
-                        className={`text-xs ${
-                          stockStatus === "In Stock"
-                            ? "text-green-600"
-                            : stockStatus === "Low Stock"
-                              ? "text-orange-600"
-                              : "text-red-600"
-                        }`}
-                      >
-                        {stockStatus}
-                      </p>
-                    </td>
-
-                    <td className="px-5 py-4">
-                      {item.measurement_required ? (
-                        <span className="inline-flex items-center gap-2 text-green-700">
-                          <CheckCircle size={16} /> Yes
-                        </span>
-                      ) : (
-                        <span className="inline-flex items-center gap-2 text-gray-500">
-                          <XCircle size={16} /> No
-                        </span>
-                      )}
-                    </td>
-
-                    <td className="px-5 py-4">
-                      <StatusBadge type={item.status}>{item.status}</StatusBadge>
-                    </td>
-
-                    <td className="px-5 py-4">
-                      {new Date(item.created_at).toLocaleDateString("en-IN", {
-                        day: "2-digit",
-                        month: "short",
-                        year: "numeric",
-                      })}
-                    </td>
-
-                    <td className="px-5 py-4">
-                      <div className="flex items-center gap-2">
-                        <button
-                          type="button"
-                          onClick={() =>
-                            navigate(`/admin/products/${item.id}/edit`)
-                          }
-                          className="rounded-lg border p-2 hover:bg-gray-50"
+                        <p
+                          className={`text-xs ${
+                            stockStatus === "in"
+                              ? "text-green-600"
+                              : stockStatus === "low"
+                                ? "text-orange-600"
+                                : "text-red-600"
+                          }`}
                         >
-                          <Pencil size={17} />
-                        </button>
+                          {stockLabel}
+                        </p>
+                      </td>
 
-                        <DropdownMenu>
-                          <DropdownMenuTrigger className="rounded-lg border p-2 hover:bg-gray-50">
-                            {/* <button
-                              type="button"
-                              
-                            > */}
-                              <MoreVertical size={17} />
-                            {/* </button> */}
-                          </DropdownMenuTrigger>
+                      <td className="px-5 py-4">
+                        {item.measurement_required ? (
+                          <span className="inline-flex items-center gap-2 text-green-700">
+                            <CheckCircle size={16} /> Yes
+                          </span>
+                        ) : (
+                          <span className="inline-flex items-center gap-2 text-gray-500">
+                            <XCircle size={16} /> No
+                          </span>
+                        )}
+                      </td>
 
-                          <DropdownMenuContent align="end" className="w-52">
-                            <DropdownMenuItem
-                              onClick={() =>
-                                navigate(`/admin/products/${item.id}/view`)
-                              }
-                            >
-                              <Eye className="mr-2 h-4 w-4" />
-                              View Product
-                            </DropdownMenuItem>
+                      <td className="px-5 py-4">
+                        <StatusBadge type={item.status}>{item.status}</StatusBadge>
+                      </td>
 
-                            <DropdownMenuItem
-                              onClick={() =>
-                                navigate(`/admin/products/${item.id}/edit`)
-                              }
-                            >
-                              <Pencil className="mr-2 h-4 w-4" />
-                              Edit Product
-                            </DropdownMenuItem>
+                      <td className="px-5 py-4">
+                        {item.created_at
+                          ? new Date(item.created_at).toLocaleDateString("en-IN", {
+                              day: "2-digit",
+                              month: "short",
+                              year: "numeric",
+                            })
+                          : "-"}
+                      </td>
 
-                            <DropdownMenuItem
-                              onClick={() => duplicateProduct(item.id)}
-                            >
-                              <Copy className="mr-2 h-4 w-4" />
-                              Duplicate
-                            </DropdownMenuItem>
+                      <td className="px-5 py-4">
+                        <div className="flex items-center gap-2">
+                          <button
+                            type="button"
+                            onClick={() => navigate(`/admin/products/${item.id}/edit`)}
+                            className="rounded-lg border p-2 hover:bg-gray-50"
+                          >
+                            <Pencil size={17} />
+                          </button>
 
-                            <DropdownMenuSeparator />
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <button
+                                type="button"
+                                className="rounded-lg border p-2 hover:bg-gray-50"
+                              >
+                                <MoreVertical size={17} />
+                              </button>
+                            </DropdownMenuTrigger>
 
-                            <DropdownMenuItem
-                              onClick={() => archiveProduct(item.id)}
-                            >
-                              <Archive className="mr-2 h-4 w-4" />
-                              Archive
-                            </DropdownMenuItem>
+                            <DropdownMenuContent align="end" className="w-52">
+                              <DropdownMenuItem
+                                onClick={() =>
+                                  navigate(`/admin/products/${item.id}/view`)
+                                }
+                              >
+                                <Eye className="mr-2 h-4 w-4" />
+                                View Product
+                              </DropdownMenuItem>
 
-                            <DropdownMenuItem
-                              onClick={() => deleteProduct(item.id)}
-                              className="text-red-600 focus:text-red-600"
-                            >
-                              <Trash2 className="mr-2 h-4 w-4" />
-                              Delete
-                            </DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
-                      </div>
-                    </td>
-                  </tr>
-                );
-              })}
+                              <DropdownMenuItem
+                                onClick={() =>
+                                  navigate(`/admin/products/${item.id}/edit`)
+                                }
+                              >
+                                <Pencil className="mr-2 h-4 w-4" />
+                                Edit Product
+                              </DropdownMenuItem>
+
+                              <DropdownMenuItem
+                                onClick={() => duplicateProduct(item.id)}
+                              >
+                                <Copy className="mr-2 h-4 w-4" />
+                                Duplicate
+                              </DropdownMenuItem>
+
+                              <DropdownMenuSeparator />
+
+                              {item.status === "Archived" ? (
+                                <DropdownMenuItem
+                                  onClick={() => restoreProduct(item.id)}
+                                >
+                                  <RotateCcw className="mr-2 h-4 w-4" />
+                                  Restore
+                                </DropdownMenuItem>
+                              ) : (
+                                <DropdownMenuItem
+                                  onClick={() => archiveProduct(item.id)}
+                                >
+                                  <Archive className="mr-2 h-4 w-4" />
+                                  Archive
+                                </DropdownMenuItem>
+                              )}
+
+                              <DropdownMenuItem
+                                onClick={() => deleteProduct(item.id)}
+                                className="text-red-600 focus:text-red-600"
+                              >
+                                <Trash2 className="mr-2 h-4 w-4" />
+                                Delete
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })
+              )}
             </tbody>
           </table>
         </div>
 
         <div className="flex flex-col gap-4 p-5 sm:flex-row sm:items-center sm:justify-between">
           <p className="text-sm text-gray-600">
-            Showing 1 to {products.length} of {products.length} products
+            Showing {filteredProducts.length} of {products.length} products
+            {archivedProducts > 0 ? ` • ${archivedProducts} archived` : ""}
           </p>
 
           <div className="flex items-center gap-2">
-            <button className="rounded-lg border px-4 py-2 text-sm">
+            <button type="button" className="rounded-lg border px-4 py-2 text-sm">
               10 per page
               <ChevronDown size={14} className="ml-2 inline" />
             </button>
 
-            <button className="h-9 w-9 rounded-lg border bg-[#061735] text-sm text-white">
+            <button
+              type="button"
+              className="h-9 w-9 rounded-lg border bg-[#061735] text-sm text-white"
+            >
               1
             </button>
           </div>
         </div>
       </div>
-    </div>
-  );
-}
 
-function SelectBox({ label }) {
-  return (
-    <button className="flex items-center justify-between rounded-lg border bg-white px-4 py-3 text-sm">
-      {label}
-      <ChevronDown size={16} />
-    </button>
+      <ExportProductsDialog
+        open={exportOpen}
+        setOpen={setExportOpen}
+        onExport={exportProducts}
+      />
+    </div>
   );
 }
 
@@ -545,7 +883,7 @@ function StatusBadge({ children, type }) {
         styles[type] || "bg-gray-100 text-gray-700"
       }`}
     >
-      {children}
+      {children || "-"}
     </span>
   );
 }

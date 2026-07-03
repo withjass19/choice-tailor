@@ -1,6 +1,7 @@
 import AdminNavbar from "@/pages/Admin/_components/AdminNavbar";
 import AdminSidebar from "@/pages/Admin/_components/AdminSidebar";
 import { Outlet } from "react-router-dom";
+import { Toaster } from "@/components/ui/sonner";
 
 export default function AdminLayout() {
   return (
@@ -16,10 +17,11 @@ export default function AdminLayout() {
 
         {/* Top Navbar */}
         <AdminNavbar />
-
+        
         {/* Scrollable Content */}
         <main className="flex-1 overflow-y-auto p-6">
           <Outlet />
+          <Toaster richColors position="top-center" />
         </main>
 
       </div>
