@@ -13,22 +13,22 @@ import { useCart } from "@/hooks/useCart";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/lib/supabase";
 
-const loadRazorpayScript = () => {
-  return new Promise((resolve) => {
-    if (window.Razorpay) {
-      resolve(true);
-      return;
-    }
+// const loadRazorpayScript = () => {
+//   return new Promise((resolve) => {
+//     if (window.Razorpay) {
+//       resolve(true);
+//       return;
+//     }
 
-    const script = document.createElement("script");
-    script.src = "https://checkout.razorpay.com/v1/checkout.js";
+//     const script = document.createElement("script");
+//     script.src = "https://checkout.razorpay.com/v1/checkout.js";
 
-    script.onload = () => resolve(true);
-    script.onerror = () => resolve(false);
+//     script.onload = () => resolve(true);
+//     script.onerror = () => resolve(false);
 
-    document.body.appendChild(script);
-  });
-};
+//     document.body.appendChild(script);
+//   });
+// };
 
 export default function CartDrawer() {
   const navigate = useNavigate();
@@ -41,7 +41,7 @@ export default function CartDrawer() {
     increaseQuantity,
     decreaseQuantity,
     removeFromCart,
-    clearCart,
+    // clearCart,
     subtotal,
   } = useCart();
 
@@ -74,82 +74,11 @@ export default function CartDrawer() {
         return;
       }
 
-      const isLoaded = await loadRazorpayScript();
+      toast.success("Checkout ready. Payment disabled for now.");
+      setCartOpen(false);
 
-      if (!isLoaded) {
-        toast.error("Razorpay SDK failed to load.");
-        return;
-      }
-
-      const orderRes = await fetch("/api/create-razorpay-order", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          amount: subtotal,
-        }),
-      });
-
-      const order = await orderRes.json();
-
-      if (!orderRes.ok) {
-        throw new Error(order?.message || "Order creation failed.");
-      }
-
-      const options = {
-        key: import.meta.env.VITE_RAZORPAY_KEY_ID,
-        amount: order.amount,
-        currency: order.currency,
-        name: "Choice Tailor",
-        description: "Uniform Order Payment",
-        order_id: order.id,
-
-        prefill: {
-          name: user.user_metadata?.full_name || "",
-          email: user.email || "",
-          contact: "",
-        },
-
-        notes: {
-          brand: "Choice Tailor",
-          user_id: user.id,
-        },
-
-        theme: {
-          color: "#061735",
-        },
-
-        handler: async function (response) {
-          const verifyRes = await fetch("/api/verify-razorpay-payment", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify(response),
-          });
-
-          const verifyData = await verifyRes.json();
-
-          if (!verifyRes.ok || !verifyData.success) {
-            toast.error("Payment verification failed.");
-            return;
-          }
-
-          toast.success("Payment successful.");
-          setCartOpen(false);
-
-          console.log("Payment Response:", response);
-          console.log("Cart Items:", cartItems);
-
-          clearCart();
-
-          // navigate("/order-success");
-        },
-      };
-
-      const razorpay = new window.Razorpay(options);
-      razorpay.open();
+      // Abhi payment disabled hai, later yaha order create/payment flow add karenge.
+      navigate("/dashboard/orders");
     } catch (error) {
       console.error("Checkout failed:", error);
       toast.error(error.message || "Checkout failed.");
