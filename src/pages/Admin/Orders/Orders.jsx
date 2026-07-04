@@ -52,6 +52,8 @@ export default function AdminOrders() {
         `)
         .order("created_at", { ascending: false });
 
+        console.log("Fetched orders:", ordersData);
+
       if (ordersError) throw ordersError;
 
       const userIds = [

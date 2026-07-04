@@ -1,17 +1,8 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Menu, X, ShoppingCart } from "lucide-react";
-// import { ChevronDown } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 
 import { logo } from "../../assets/images";
-
-// import {
-//   DropdownMenu,
-//   DropdownMenuContent,
-//   DropdownMenuItem,
-//   DropdownMenuTrigger,
-// } from "@/components/ui/dropdown-menu";
-
 import { useAuth } from "@/hooks/useAuth";
 import { useCart } from "@/hooks/useCart";
 
@@ -20,35 +11,51 @@ import CartDrawer from "@/components/Cart/CartDrawer";
 
 export default function NavBar() {
   const [isOpen, setIsOpen] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
+
   const navigate = useNavigate();
 
   const { user, profile, isAuthenticated, logoutUser } = useAuth();
   const { totalQuantity, setCartOpen } = useCart();
 
-  const login = () => {
-    navigate("/login");
-  };
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 20);
+    };
 
-  const closeMobileMenu = () => {
-    setIsOpen(false);
-  };
+    handleScroll();
+    window.addEventListener("scroll", handleScroll);
 
-  const openCart = () => {
-    setCartOpen(true);
-  };
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  const login = () => navigate("/login");
+
+  const closeMobileMenu = () => setIsOpen(false);
+
+  const openCart = () => setCartOpen(true);
 
   return (
     <>
-      <nav className="w-full border-b bg-white">
-        <div className="mx-auto flex w-[90%] items-center justify-between py-4">
-          <Link
-            to="/"
-            className="flex cursor-pointer flex-row items-center gap-3"
-          >
+      <nav
+        className={`sticky top-0 z-50 w-full border-b bg-white/95 backdrop-blur transition-all duration-300 ${
+          isScrolled
+            ? "shadow-lg shadow-black/5"
+            : "shadow-none"
+        }`}
+      >
+        <div
+          className={`mx-auto flex w-[90%] items-center justify-between transition-all duration-300 ${
+            isScrolled ? "py-2" : "py-4"
+          }`}
+        >
+          <Link to="/" className="flex items-center gap-3">
             <img
               src={logo}
               alt="Choice Tailor"
-              className="h-12 w-12 object-contain"
+              className={`object-contain transition-all duration-300 ${
+                isScrolled ? "h-10 w-10" : "h-12 w-12"
+              }`}
             />
 
             <div>
@@ -60,33 +67,11 @@ export default function NavBar() {
           </Link>
 
           <div className="hidden items-center gap-8 font-medium lg:flex">
-            <Link to="/">Home</Link>
-            <Link to="/shop">Shop</Link>
-
-            {/* <DropdownMenu>
-              <DropdownMenuTrigger className="flex items-center gap-1 outline-none hover:text-[#b89b3c]">
-                Uniforms
-                <ChevronDown size={16} />
-              </DropdownMenuTrigger>
-
-              <DropdownMenuContent align="start" className="w-52">
-                <DropdownMenuItem asChild>
-                  <Link to="/shop">Service Uniform</Link>
-                </DropdownMenuItem>
-
-                <DropdownMenuItem asChild>
-                  <Link to="/shop">Flying Overall</Link>
-                </DropdownMenuItem>
-
-                <DropdownMenuItem asChild>
-                  <Link to="/shop">Combat Uniform</Link>
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu> */}
-
-            <Link to="/">Track Order</Link>
-            <Link to="/about">About</Link>
-            <Link to="/contact">Contact Us</Link>
+            <NavLink to="/">Home</NavLink>
+            <NavLink to="/shop">Shop</NavLink>
+            <NavLink to="/track-order">Track Order</NavLink>
+            <NavLink to="/about">About</NavLink>
+            <NavLink to="/contact">Contact Us</NavLink>
           </div>
 
           <div className="hidden items-center gap-4 lg:flex">
@@ -100,7 +85,7 @@ export default function NavBar() {
               <button
                 type="button"
                 onClick={login}
-                className="rounded-lg border border-gray-300 px-6 py-2"
+                className="rounded-lg border-[2.5px] border-gray-300 px-6 py-2 transition hover:border-[#061735] hover:bg-[#061735] hover:text-white"
               >
                 Login
               </button>
@@ -109,12 +94,12 @@ export default function NavBar() {
             <button
               type="button"
               onClick={openCart}
-              className="relative rounded-full p-2 transition hover:bg-gray-100"
+              className="relative rounded-full p-2 transition hover:bg-gray-100 hover:scale-105"
             >
               <ShoppingCart size={24} className="text-[#061735]" />
 
               {totalQuantity > 0 && (
-                <span className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-[#b89b3c] text-[10px] font-bold text-white">
+                <span className="absolute -right-1 -top-1 flex h-5 w-5 animate-bounce items-center justify-center rounded-full bg-[#b89b3c] text-[10px] font-bold text-white">
                   {totalQuantity}
                 </span>
               )}
@@ -130,100 +115,84 @@ export default function NavBar() {
           </button>
         </div>
 
-        {isOpen && (
-          <div className="border-t bg-white lg:hidden">
-            <div className="mx-auto flex w-[90%] flex-col gap-4 py-4">
-              <Link to="/" onClick={closeMobileMenu}>
-                Home
-              </Link>
+        <div
+          className={`overflow-hidden border-t bg-white transition-all duration-300 lg:hidden ${
+            isOpen ? "max-h-[500px] opacity-100" : "max-h-0 opacity-0"
+          }`}
+        >
+          <div className="mx-auto flex w-[90%] flex-col gap-4 py-4">
+            <MobileLink to="/" onClick={closeMobileMenu}>Home</MobileLink>
+            <MobileLink to="/shop" onClick={closeMobileMenu}>Shop</MobileLink>
+            <MobileLink to="/track-order" onClick={closeMobileMenu}>Track Order</MobileLink>
+            <MobileLink to="/about" onClick={closeMobileMenu}>About</MobileLink>
+            <MobileLink to="/contact" onClick={closeMobileMenu}>Contact Us</MobileLink>
 
-              <Link to="/shop" onClick={closeMobileMenu}>
-                Shop
-              </Link>
-
-              {/* <DropdownMenu>
-                <DropdownMenuTrigger className="flex items-center gap-1 outline-none hover:text-[#b89b3c]">
-                  Uniforms
-                  <ChevronDown size={16} />
-                </DropdownMenuTrigger>
-
-                <DropdownMenuContent align="start" className="w-52">
-                  <DropdownMenuItem asChild>
-                    <Link to="/shop" onClick={closeMobileMenu}>
-                      Service Uniform
-                    </Link>
-                  </DropdownMenuItem>
-
-                  <DropdownMenuItem asChild>
-                    <Link to="/shop" onClick={closeMobileMenu}>
-                      Flying Overall
-                    </Link>
-                  </DropdownMenuItem>
-
-                  <DropdownMenuItem asChild>
-                    <Link to="/shop" onClick={closeMobileMenu}>
-                      Combat Uniform
-                    </Link>
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu> */}
-
-              <Link to="/" onClick={closeMobileMenu}>
-                Track Order
-              </Link>
-
-              <Link to="/about" onClick={closeMobileMenu}>
-                About
-              </Link>
-
-              <Link to="/contact" onClick={closeMobileMenu}>
-                Contact Us
-              </Link>
-
-              <div className="flex flex-col gap-3 pt-4">
-                {isAuthenticated ? (
-                  <UserDropdown
-                    user={user}
-                    profile={profile}
-                    logoutUser={logoutUser}
-                  />
-                ) : (
-                  <button
-                    type="button"
-                    onClick={() => {
-                      login();
-                      closeMobileMenu();
-                    }}
-                    className="rounded-lg border border-gray-300 py-2"
-                  >
-                    Login
-                  </button>
-                )}
-
+            <div className="flex flex-col gap-3 pt-4">
+              {isAuthenticated ? (
+                <UserDropdown
+                  user={user}
+                  profile={profile}
+                  logoutUser={logoutUser}
+                />
+              ) : (
                 <button
                   type="button"
                   onClick={() => {
+                    login();
                     closeMobileMenu();
-                    openCart();
                   }}
-                  className="relative flex items-center justify-center gap-2 rounded-lg bg-[#061735] py-2 text-white"
+                  className="rounded-lg border-[2px] border-gray-300 py-2 transition hover:border-[#061735] hover:bg-[#061735] hover:text-white"
                 >
-                  <ShoppingCart size={20} />
-                  Cart
-
-                  {totalQuantity > 0 && (
-                    <span className="absolute right-3 flex h-5 w-5 items-center justify-center rounded-full bg-[#b89b3c] text-[10px] font-bold text-white">
-                      {totalQuantity}
-                    </span>
-                  )}
+                  Login
                 </button>
-              </div>
+              )}
+
+              <button
+                type="button"
+                onClick={() => {
+                  closeMobileMenu();
+                  openCart();
+                }}
+                className="relative flex items-center justify-center gap-2 rounded-lg bg-[#061735] py-2 text-white"
+              >
+                <ShoppingCart size={20} />
+                Cart
+
+                {totalQuantity > 0 && (
+                  <span className="absolute right-3 flex h-5 w-5 items-center justify-center rounded-full bg-[#b89b3c] text-[10px] font-bold text-white">
+                    {totalQuantity}
+                  </span>
+                )}
+              </button>
             </div>
           </div>
-        )}
+        </div>
       </nav>
 
       <CartDrawer />
     </>
+  );
+}
+
+function NavLink({ to, children }) {
+  return (
+    <Link
+      to={to}
+      className="relative transition hover:text-[#b89b3c] after:absolute after:-bottom-1 after:left-0 after:h-[2px] after:w-0 after:bg-[#b89b3c] after:transition-all after:duration-300 hover:after:w-full"
+    >
+      {children}
+    </Link>
+  );
+}
+
+function MobileLink({ to, onClick, children }) {
+  return (
+    <Link
+      to={to}
+      onClick={onClick}
+      className="rounded-lg px-3 py-2 transition hover:bg-[#f6efe1] hover:text-[#b89b3c]"
+    >
+      {children}
+    </Link>
   );
 }
