@@ -5,7 +5,6 @@ import {
   Package,
   Users,
   FolderTree,
-  Boxes,
   BarChart3,
   Settings,
 } from "lucide-react";
@@ -42,11 +41,6 @@ const menus = [
     title: "Categories",
     icon: FolderTree,
     path: "/admin/categories",
-  },
-  {
-    title: "Inventory",
-    icon: Boxes,
-    path: "/admin/inventory",
   },
   {
     title: "Reports",

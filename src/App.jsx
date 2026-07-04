@@ -24,7 +24,7 @@ import AdminProducts from "./pages/Admin/Products/Products";
 import CreateProduct from "./pages/Admin/Products/CreateProduct";
 import Customers from "./pages/Admin/Customers/Customers";
 import Categories from "./pages/Admin/Categories/Categories";
-import Inventory from "./pages/Admin/Inventory/Inventory";
+// import Inventory from "./pages/Admin/Inventory/Inventory";
 import ProtectedRoute from "./routes/ProtectedRoute";
 import AdminRoute from "./routes/AdminRoute";
 import Contact from "./pages/Contact/Contact";
@@ -90,7 +90,7 @@ export default function App() {
 
         <Route path="categories" element={<Categories />} />
 
-        <Route path="inventory" element={<Inventory />} />
+        {/* <Route path="inventory" element={<Inventory />} /> */}
 
         {/* <Route path="reports" element={<Reports />} /> */}
 
