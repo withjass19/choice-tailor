@@ -1,35 +1,58 @@
 import {
   ChevronLeft,
   ChevronRight,
-  ChevronDown,
+  // ChevronDown,
 } from "lucide-react";
 
-export default function CategoryPagination() {
+export default function CategoryPagination({
+  page,
+  setPage,
+  totalItems,
+  totalPages,
+  pageSize,
+  setPageSize,
+}) {
+  const start = totalItems === 0 ? 0 : (page - 1) * pageSize + 1;
+  const end = Math.min(page * pageSize, totalItems);
+
   return (
     <div className="flex flex-col items-center justify-between gap-4 border-t bg-white px-6 py-5 lg:flex-row">
       <p className="text-sm text-gray-500">
-        Showing 1 to 7 of 7 categories
+        Showing {start} to {end} of {totalItems} categories
       </p>
 
       <div className="flex items-center gap-3">
-        {/* Per Page */}
-        <button className="flex items-center gap-2 rounded-lg border px-4 py-2 text-sm">
-          10 per page
-          <ChevronDown size={16} />
-        </button>
+        <select
+          value={pageSize}
+          onChange={(e) => {
+            setPageSize(Number(e.target.value));
+            setPage(1);
+          }}
+          className="rounded-lg border px-4 py-2 text-sm"
+        >
+          <option value={5}>5 per page</option>
+          <option value={10}>10 per page</option>
+          <option value={20}>20 per page</option>
+          <option value={50}>50 per page</option>
+        </select>
 
-        {/* Previous */}
-        <button className="flex h-9 w-9 items-center justify-center rounded-lg border hover:bg-gray-100">
+        <button
+          disabled={page === 1}
+          onClick={() => setPage(page - 1)}
+          className="flex h-9 w-9 items-center justify-center rounded-lg border disabled:cursor-not-allowed disabled:opacity-50 hover:bg-gray-100"
+        >
           <ChevronLeft size={16} />
         </button>
 
-        {/* Current */}
-        <button className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#061735] text-white">
-          1
-        </button>
+        <span className="rounded-lg bg-[#061735] px-4 py-2 text-sm font-semibold text-white">
+          {page}
+        </span>
 
-        {/* Next */}
-        <button className="flex h-9 w-9 items-center justify-center rounded-lg border hover:bg-gray-100">
+        <button
+          disabled={page === totalPages}
+          onClick={() => setPage(page + 1)}
+          className="flex h-9 w-9 items-center justify-center rounded-lg border disabled:cursor-not-allowed disabled:opacity-50 hover:bg-gray-100"
+        >
           <ChevronRight size={16} />
         </button>
       </div>

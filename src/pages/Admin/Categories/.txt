@@ -1,0 +1,15 @@
+Categories/
+│
+├── Categories.jsx
+│
+├── _components/
+│   ├── CategoryStats.jsx
+│   ├── CategoryFilters.jsx
+│   ├── CategoriesTable.jsx
+│   ├── CategoryPagination.jsx
+│   ├── AddCategoryDialog.jsx
+│   ├── EditCategoryDialog.jsx
+│   ├── DeleteCategoryDialog.jsx
+│   ├── ExportCategoriesDialog.jsx
+│   ├── CategoryStatusBadge.jsx
+│   └── CategoryActions.jsx
