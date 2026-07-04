@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Minus, Plus, Trash2, ShoppingCart } from "lucide-react";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
@@ -13,26 +14,15 @@ import { useCart } from "@/hooks/useCart";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/lib/supabase";
 
-// const loadRazorpayScript = () => {
-//   return new Promise((resolve) => {
-//     if (window.Razorpay) {
-//       resolve(true);
-//       return;
-//     }
-
-//     const script = document.createElement("script");
-//     script.src = "https://checkout.razorpay.com/v1/checkout.js";
-
-//     script.onload = () => resolve(true);
-//     script.onerror = () => resolve(false);
-
-//     document.body.appendChild(script);
-//   });
-// };
+const generateOrderNumber = () => {
+  return `CT-${Date.now()}`;
+};
 
 export default function CartDrawer() {
   const navigate = useNavigate();
   const { user, isAuthenticated } = useAuth();
+
+  const [checkoutLoading, setCheckoutLoading] = useState(false);
 
   const {
     cartItems,
@@ -41,12 +31,14 @@ export default function CartDrawer() {
     increaseQuantity,
     decreaseQuantity,
     removeFromCart,
-    // clearCart,
+    clearCart,
     subtotal,
   } = useCart();
 
   const handleCheckout = async () => {
     try {
+      if (checkoutLoading) return;
+
       if (cartItems.length === 0) {
         toast.error("Your cart is empty.");
         return;
@@ -59,10 +51,13 @@ export default function CartDrawer() {
         return;
       }
 
+      setCheckoutLoading(true);
+
       const { data: addresses, error: addressError } = await supabase
         .from("addresses")
         .select("id")
         .eq("user_id", user.id)
+        .order("is_default", { ascending: false })
         .limit(1);
 
       if (addressError) throw addressError;
@@ -74,14 +69,56 @@ export default function CartDrawer() {
         return;
       }
 
-      toast.success("Checkout ready. Payment disabled for now.");
+      const addressId = addresses[0].id;
+      const orderNumber = generateOrderNumber();
+
+      // replace only this part inside handleCheckout
+
+      const { data: order, error: orderError } = await supabase
+        .from("orders")
+        .insert({
+          order_number: orderNumber,
+          user_id: user.id,
+          address_id: addressId,
+          subtotal: Number(subtotal),
+          shipping_charge: 0,
+          total_amount: Number(subtotal),
+          payment_status: "pending",
+          order_status: "pending",
+        })
+        .select()
+        .single();
+
+      if (orderError) throw orderError;
+
+      const orderItems = cartItems.map((item) => ({
+        order_id: order.id,
+        product_id: item.id,
+        product_name: item.name || "Product",
+        category: item.category || null,
+        image: item.image || null,
+        quantity: Number(item.quantity),
+        unit_price: Number(item.price),
+        total_price: Number(item.price) * Number(item.quantity),
+      }));
+
+      const { error: itemsError } = await supabase
+        .from("order_items")
+        .insert(orderItems);
+
+      if (itemsError) throw itemsError;
+
+      clearCart();
       setCartOpen(false);
 
-      // Abhi payment disabled hai, later yaha order create/payment flow add karenge.
+      toast.success("Order placed successfully.");
+
       navigate("/dashboard/orders");
     } catch (error) {
       console.error("Checkout failed:", error);
-      toast.error(error.message || "Checkout failed.");
+      toast.error(error.message || "Failed to place order.");
+    } finally {
+      setCheckoutLoading(false);
     }
   };
 
@@ -168,9 +205,10 @@ export default function CartDrawer() {
               <button
                 type="button"
                 onClick={handleCheckout}
-                className="mt-5 w-full rounded-lg bg-[#061735] py-3 text-sm font-bold text-white"
+                disabled={checkoutLoading}
+                className="mt-5 w-full rounded-lg bg-[#061735] py-3 text-sm font-bold text-white disabled:opacity-60"
               >
-                Checkout
+                {checkoutLoading ? "Placing Order..." : "Place Order"}
               </button>
 
               <button
