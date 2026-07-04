@@ -1,5 +1,3 @@
-// import Footer from "@/components/Footer/Footer";
-import ImageUpload from "@/components/ImageUpload/ImageUpload";
 import Categories from "./_components/Categories";
 import HeroSection from "./_components/HeroSection";
 import OrderSteps from "./_components/OrderSteps";
@@ -37,7 +35,6 @@ export default function Home() {
       <PopularItems products={popularProducts} />
       <WhyChooseSection />
       <TestimonialsSection />
-      <ImageUpload />
       {/* <Footer/> */}
     </div>
   );
