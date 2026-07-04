@@ -17,10 +17,10 @@ export default function CategroyCard({ categroy, image, width, height }) {
       <p className="text-sm font-semibold text-[#061735] sm:text-base">
         {categroy}
       </p>
-
+{/* 
       <button className="text-xs font-medium text-[#b89b3c] transition hover:text-[#8b762c] sm:text-sm">
         Explore
-      </button>
+      </button> */}
     </div>
   );
 }
