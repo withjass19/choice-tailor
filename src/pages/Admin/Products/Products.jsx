@@ -27,6 +27,8 @@ import {
 
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
+import Pagination from "@/components/common/Pagination";
+import StatusBadge from "@/components/common/StatusBadge";
 import { supabase } from "@/lib/supabase";
 
 import {
@@ -838,26 +840,16 @@ export default function AdminProducts() {
           </table>
         </div>
 
-        <div className="flex flex-col gap-4 p-5 sm:flex-row sm:items-center sm:justify-between">
-          <p className="text-sm text-gray-600">
-            Showing {filteredProducts.length} of {products.length} products
-            {archivedProducts > 0 ? ` • ${archivedProducts} archived` : ""}
-          </p>
-
-          <div className="flex items-center gap-2">
-            <button type="button" className="rounded-lg border px-4 py-2 text-sm">
-              10 per page
-              <ChevronDown size={14} className="ml-2 inline" />
-            </button>
-
-            <button
-              type="button"
-              className="h-9 w-9 rounded-lg border bg-[#061735] text-sm text-white"
-            >
-              1
-            </button>
-          </div>
-        </div>
+        <Pagination
+          page={1}
+          setPage={() => {}}
+          totalItems={filteredProducts.length}
+          totalPages={1}
+          pageSize={10}
+          setPageSize={() => {}}
+          label={`products${archivedProducts > 0 ? ` • ${archivedProducts} archived` : ""}`}
+          className="rounded-b-xl border-x border-b"
+        />
       </div>
 
       <ExportProductsDialog
@@ -869,21 +861,3 @@ export default function AdminProducts() {
   );
 }
 
-function StatusBadge({ children, type }) {
-  const styles = {
-    Active: "bg-green-100 text-green-700",
-    "Out of Stock": "bg-red-100 text-red-700",
-    Draft: "bg-gray-100 text-gray-700",
-    Archived: "bg-yellow-100 text-yellow-700",
-  };
-
-  return (
-    <span
-      className={`inline-flex rounded-full px-3 py-1 text-xs font-semibold ${
-        styles[type] || "bg-gray-100 text-gray-700"
-      }`}
-    >
-      {children || "-"}
-    </span>
-  );
-}

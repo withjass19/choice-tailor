@@ -9,7 +9,9 @@ import {
 
 import { IoAirplane } from "react-icons/io5";
 
-export default function PopularItems({ products = [] }) {
+export default function PopularItems({ products = [], loading = false }) {
+  const hasProducts = products.length > 0;
+
   return (
     <section className="w-full px-4 py-12 sm:px-6 md:px-10 lg:px-16">
       <div className="mx-auto max-w-7xl">
@@ -26,7 +28,9 @@ export default function PopularItems({ products = [] }) {
         </div>
 
         <div className="mt-10 flex justify-center">
-          {products.length === 0 ? (
+          {loading ? (
+            <p className="text-sm text-gray-500">Loading popular products...</p>
+          ) : !hasProducts ? (
             <p className="text-sm text-gray-500">No popular products found.</p>
           ) : (
             <Carousel

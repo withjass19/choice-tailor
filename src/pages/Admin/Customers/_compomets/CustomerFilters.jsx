@@ -2,7 +2,7 @@ import { Search, Filter, Calendar, ChevronDown } from "lucide-react";
 
 export default function CustomerFilters() {
   return (
-    <div className="grid gap-4 lg:grid-cols-[1.4fr_0.7fr_0.7fr_0.9fr_1.1fr_auto]">
+    <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-[1.4fr_0.7fr_0.7fr_0.9fr_1.1fr_auto]">
       <div className="relative">
         <Search
           size={18}
@@ -18,13 +18,13 @@ export default function CustomerFilters() {
       <SelectBox label="All Cities" />
       <SelectBox label="All Customer Type" />
 
-      <button className="flex items-center justify-center gap-2 rounded-lg border bg-white px-4 py-3 text-sm">
+      <button className="flex items-center justify-center gap-2 rounded-lg border bg-white px-4 py-3 text-sm md:col-span-2 xl:col-span-1">
         <Calendar size={17} />
         10 Jun, 2024 - 10 Jul, 2024
         <ChevronDown size={16} />
       </button>
 
-      <button className="flex items-center justify-center gap-2 rounded-lg border bg-white px-5 py-3 text-sm font-semibold">
+      <button className="flex items-center justify-center gap-2 rounded-lg border bg-white px-5 py-3 text-sm font-semibold md:col-span-2 xl:col-span-1">
         <Filter size={17} />
         Filter
       </button>

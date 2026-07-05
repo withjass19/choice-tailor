@@ -38,18 +38,18 @@ export default function NavBar() {
   return (
     <>
       <nav
-        className={`sticky top-0 z-50 w-full border-b bg-white/95 backdrop-blur transition-all duration-300 ${
+        className={`sticky top-0 z-50 w-full overflow-x-hidden border-b bg-white/95 backdrop-blur transition-all duration-300 ${
           isScrolled
             ? "shadow-lg shadow-black/5"
             : "shadow-none"
         }`}
       >
         <div
-          className={`mx-auto flex w-[90%] items-center justify-between transition-all duration-300 ${
-            isScrolled ? "py-2" : "py-4"
+          className={`mx-auto flex w-full max-w-7xl items-center justify-between px-4 transition-all duration-300 sm:px-6 lg:px-8 ${
+            isScrolled ? "py-2" : "py-3 sm:py-4"
           }`}
         >
-          <Link to="/" className="flex items-center gap-3">
+          <Link to="/" className="flex min-w-0 items-center gap-2 sm:gap-3">
             <img
               src={logo}
               alt="Choice Tailor"
@@ -58,9 +58,9 @@ export default function NavBar() {
               }`}
             />
 
-            <div>
-              <h2 className="text-lg font-bold md:text-xl">CHOICE TAILOR</h2>
-              <p className="text-xs text-gray-600">
+            <div className="min-w-0">
+              <h2 className="text-sm font-bold sm:text-base md:text-xl">CHOICE TAILOR</h2>
+              <p className="hidden text-xs text-gray-600 sm:block">
                 Perfect Fit for Every Mission
               </p>
             </div>
@@ -74,7 +74,7 @@ export default function NavBar() {
             <NavLink to="/contact">Contact Us</NavLink>
           </div>
 
-          <div className="hidden items-center gap-4 lg:flex">
+          <div className="hidden items-center gap-3 lg:flex">
             {isAuthenticated ? (
               <UserDropdown
                 user={user}
@@ -85,7 +85,7 @@ export default function NavBar() {
               <button
                 type="button"
                 onClick={login}
-                className="rounded-lg border-[2.5px] border-gray-300 px-6 py-2 transition hover:border-[#061735] hover:bg-[#061735] hover:text-white"
+                className="w-full rounded-lg border-[2.5px] border-gray-300 px-4 py-2 text-sm transition hover:border-[#061735] hover:bg-[#061735] hover:text-white sm:w-auto sm:px-6"
               >
                 Login
               </button>
@@ -108,7 +108,7 @@ export default function NavBar() {
 
           <button
             type="button"
-            className="lg:hidden"
+            className="rounded-md p-2 lg:hidden"
             onClick={() => setIsOpen(!isOpen)}
           >
             {isOpen ? <X size={28} /> : <Menu size={28} />}
@@ -120,7 +120,7 @@ export default function NavBar() {
             isOpen ? "max-h-[500px] opacity-100" : "max-h-0 opacity-0"
           }`}
         >
-          <div className="mx-auto flex w-[90%] flex-col gap-4 py-4">
+          <div className="mx-auto flex w-full max-w-7xl flex-col gap-2 px-4 py-4 sm:px-6 lg:px-8">
             <MobileLink to="/" onClick={closeMobileMenu}>Home</MobileLink>
             <MobileLink to="/shop" onClick={closeMobileMenu}>Shop</MobileLink>
             <MobileLink to="/track-order" onClick={closeMobileMenu}>Track Order</MobileLink>
@@ -141,7 +141,7 @@ export default function NavBar() {
                     login();
                     closeMobileMenu();
                   }}
-                  className="rounded-lg border-[2px] border-gray-300 py-2 transition hover:border-[#061735] hover:bg-[#061735] hover:text-white"
+                  className="w-full rounded-lg border-[2px] border-gray-300 py-2 text-sm transition hover:border-[#061735] hover:bg-[#061735] hover:text-white"
                 >
                   Login
                 </button>
@@ -153,7 +153,7 @@ export default function NavBar() {
                   closeMobileMenu();
                   openCart();
                 }}
-                className="relative flex items-center justify-center gap-2 rounded-lg bg-[#061735] py-2 text-white"
+                className="relative flex w-full items-center justify-center gap-2 rounded-lg bg-[#061735] py-2 text-sm text-white"
               >
                 <ShoppingCart size={20} />
                 Cart

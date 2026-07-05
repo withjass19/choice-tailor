@@ -10,13 +10,13 @@ import { logo } from "../../assets/images";
 
 export default function Footer() {
   return (
-    <footer className="w-full bg-[#061735] text-white">
-      <div className="mx-auto grid max-w-7xl gap-10 px-5 py-10 sm:px-8 md:grid-cols-2 lg:grid-cols-5">
+    <footer className="w-full overflow-x-hidden bg-[#061735] text-white">
+      <div className="mx-auto grid max-w-7xl gap-8 px-4 py-10 sm:px-6 md:grid-cols-2 md:gap-10 lg:grid-cols-5 lg:px-8">
         
         {/* Brand */}
         <div>
           <div className="flex items-center gap-3">
-            <img src={logo} alt="Choice Tailor" className="h-12 w-12 object-contain" />
+            <img src={logo} alt="Choice Tailor" className="h-10 w-10 object-contain sm:h-12 sm:w-12" />
             <div>
               <h2 className="font-serif text-xl font-bold">CHOICE TAILOR</h2>
               <p className="text-xs text-gray-300">Perfect Fit for Every Mission</p>
@@ -96,7 +96,7 @@ export default function Footer() {
             className="mt-4 w-full rounded-md border border-gray-500 bg-transparent px-4 py-2 text-sm text-white outline-none placeholder:text-gray-400 focus:border-[#d4a52f]"
           />
 
-          <button className="mt-3 w-full rounded-md bg-[#d4a52f] px-4 py-2 text-sm font-semibold text-white">
+          <button className="mt-3 w-full rounded-md bg-[#d4a52f] px-4 py-2 text-sm font-semibold text-white sm:w-auto sm:px-6">
             Subscribe
           </button>
 

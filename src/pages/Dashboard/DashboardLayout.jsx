@@ -3,8 +3,8 @@ import Sidebar from "./_components/Sidebar";
 
 export default function DashboardLayout() {
   return (
-    <section className="bg-[#f8f9fc] min-h-screen">
-      <div className="max-w-7xl mx-auto px-4 lg:px-8 py-8">
+    <section className="min-h-screen overflow-x-hidden bg-[#f8f9fc]">
+      <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
         <div className="grid gap-6 lg:grid-cols-[260px_1fr]">
           <Sidebar />
 

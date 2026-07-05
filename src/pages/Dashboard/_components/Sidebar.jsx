@@ -27,8 +27,8 @@ export default function Sidebar() {
     }
   };
   return (
-    <div className="bg-white rounded-xl border p-4 h-fit">
-      <div className="space-y-2">
+    <div className="h-fit rounded-xl border bg-white p-3 sm:p-4">
+      <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-1">
         <MenuItem to="/dashboard" icon={<LayoutDashboard size={18} />}>
           Dashboard
         </MenuItem>
@@ -64,7 +64,7 @@ function MenuItem({ children, icon, to }) {
     <NavLink
       to={to}
       className={({ isActive }) =>
-        `w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left transition-all
+        `flex w-full items-center gap-3 rounded-lg px-4 py-3 text-left transition-all
         ${
           isActive
             ? "bg-[#f6efe1] text-[#b89b3c] font-medium"

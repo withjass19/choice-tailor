@@ -109,23 +109,23 @@ export default function ShopPage() {
 
   return (
     <div className="min-h-screen bg-white text-[#061735]">
-      <section className="relative overflow-hidden bg-[#061735]">
+      <section className="relative overflow-x-hidden bg-[#061735]">
         <div
           className="absolute inset-0 bg-cover bg-center opacity-40"
           style={{ backgroundImage: `url(${bgHero})` }}
         />
         <div className="absolute inset-0 bg-gradient-to-r from-[#061735] via-[#061735]/90 to-[#061735]/40" />
 
-        <div className="relative mx-auto grid max-w-7xl items-center gap-10 px-4 py-16 text-white md:grid-cols-2 lg:px-8">
+        <div className="relative mx-auto grid max-w-7xl items-center gap-8 px-4 py-10 text-white sm:px-6 md:grid-cols-2 md:gap-10 md:py-16 lg:px-8">
           <div>
-            <h2 className="font-serif text-4xl font-bold leading-tight md:text-5xl">
+            <h2 className="font-serif text-3xl font-bold leading-tight sm:text-4xl md:text-5xl">
               Shop{" "}
               <span className="text-[#d4a52f]">
                 Uniforms & Accessories
               </span>
             </h2>
 
-            <p className="mt-5 max-w-xl text-base leading-relaxed text-gray-200">
+            <p className="mt-5 max-w-xl text-sm leading-relaxed text-gray-200 sm:text-base">
               Premium IAF uniforms, custom stitching, caps, belts, badges, name
               plates and essential accessories — delivered across India.
             </p>
@@ -133,14 +133,14 @@ export default function ShopPage() {
             <div className="mt-8 flex flex-col gap-4 sm:flex-row">
               <button
                 onClick={() => setActiveCategory("IAF Uniforms")}
-                className="rounded-md bg-[#b89b3c] px-7 py-3 text-sm font-semibold text-white"
+                className="w-full rounded-md bg-[#b89b3c] px-7 py-3 text-sm font-semibold text-white sm:w-auto"
               >
                 Shop Uniforms →
               </button>
 
               <button
                 onClick={() => setActiveCategory("Belts")}
-                className="rounded-md border border-white px-7 py-3 text-sm font-semibold"
+                className="w-full rounded-md border border-white px-7 py-3 text-sm font-semibold sm:w-auto"
               >
                 Shop Accessories →
               </button>
@@ -151,14 +151,14 @@ export default function ShopPage() {
             <img
               src={ShirtModel}
               alt="IAF Uniform"
-              className="h-[360px] object-contain"
+              className="h-auto w-full max-w-full object-contain md:h-[360px]"
             />
           </div>
         </div>
       </section>
 
       <div className="border-b bg-white">
-        <div className="mx-auto flex max-w-7xl gap-6 overflow-x-auto px-4 py-4 text-sm font-semibold lg:px-8">
+        <div className="mx-auto flex max-w-7xl gap-4 overflow-x-auto px-4 py-4 text-sm font-semibold sm:gap-6 lg:px-8">
           {categories.map((item) => (
             <button
               key={item}
@@ -175,7 +175,7 @@ export default function ShopPage() {
         </div>
       </div>
 
-      <main className="mx-auto grid max-w-7xl gap-6 px-4 py-8 lg:grid-cols-[260px_1fr] lg:px-8">
+      <main className="mx-auto grid max-w-7xl gap-6 px-4 py-6 sm:px-6 lg:grid-cols-[260px_1fr] lg:px-8 lg:py-8">
         <aside className="hidden rounded-xl border bg-white p-5 shadow-sm lg:block">
           <h3 className="font-bold">Categories</h3>
 
@@ -281,7 +281,7 @@ export default function ShopPage() {
               No products found.
             </div>
           ) : (
-            <div className="grid grid-cols-2 gap-4 md:grid-cols-3 xl:grid-cols-4">
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
               {filteredProducts.map((item) => (
                 <div
                   key={item.id}
@@ -293,12 +293,12 @@ export default function ShopPage() {
 
                   <div
                     onClick={() => navigate(`/product/${item.id}`)}
-                    className="mt-4 flex h-40 cursor-pointer items-center justify-center"
+                    className="mt-4 flex h-40 cursor-pointer items-center justify-center overflow-hidden"
                   >
                     <img
                       src={item.images?.[0]}
                       alt={item.product_name}
-                      className="h-full object-contain"
+                      className="h-full w-full max-w-full object-contain"
                     />
                   </div>
 
@@ -338,7 +338,7 @@ export default function ShopPage() {
           )}
 
           <div className="mt-8 overflow-hidden rounded-xl bg-[#061735] text-white">
-            <div className="grid items-center gap-6 px-6 py-8 md:grid-cols-[1fr_2fr_1fr]">
+            <div className="grid items-center gap-6 px-4 py-6 sm:px-6 md:grid-cols-[1fr_2fr_1fr] md:px-8 md:py-8">
               <div className="hidden md:block">
                 <img
                   src={ShirtModel}
@@ -359,7 +359,7 @@ export default function ShopPage() {
 
               <button
                 type="button"
-                className="rounded-md bg-[#b89b3c] px-5 py-3 text-sm font-bold"
+                className="w-full rounded-md bg-[#b89b3c] px-5 py-3 text-sm font-bold sm:w-auto"
               >
                 Create Measurement Profile →
               </button>

@@ -12,6 +12,7 @@ import {
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/lib/supabase";
 
+import StatusBadge from "@/components/common/StatusBadge";
 import {
   DropdownMenu,
   DropdownMenuTrigger,
@@ -74,7 +75,7 @@ export default function CustomersTable({
   return (
     <div className="overflow-hidden rounded-xl border bg-white shadow-sm">
       <div className="overflow-x-auto">
-        <table className="w-full min-w-[1150px] text-sm">
+        <table className="w-full min-w-[1100px] text-sm">
           <thead>
             <tr className="border-b bg-gray-50 text-left text-xs uppercase text-[#061735]">
               <th className="px-5 py-4">Customer</th>
@@ -270,24 +271,6 @@ function TypeBadge({ children, type }) {
     <span
       className={`inline-flex rounded-full px-3 py-1 text-xs font-semibold ${
         styles[type] || "bg-gray-100 text-gray-700"
-      }`}
-    >
-      {children}
-    </span>
-  );
-}
-
-function StatusBadge({ children, status }) {
-  const styles = {
-    Active: "bg-green-100 text-green-700",
-    Inactive: "bg-red-100 text-red-700",
-    Blocked: "bg-gray-100 text-gray-700",
-  };
-
-  return (
-    <span
-      className={`inline-flex rounded-full px-3 py-1 text-xs font-semibold ${
-        styles[status] || "bg-gray-100 text-gray-700"
       }`}
     >
       {children}

@@ -11,7 +11,7 @@ export default function MainLayout() {
       <TopBar />
       <NavBar/>
       <Toaster richColors position="top-center" />
-      <main>
+      <main className="overflow-x-hidden">
         <Outlet />
       </main>
 

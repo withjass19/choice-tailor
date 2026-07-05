@@ -12,7 +12,7 @@ export default function CategoryFilters({
   resetFilters,
 }) {
   return (
-    <div className="grid gap-4 lg:grid-cols-[1.5fr_1fr_1fr_1fr_auto_auto]">
+    <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-[1.5fr_1fr_1fr_1fr_auto_auto]">
       <div className="relative">
         <Search
           size={18}
@@ -58,7 +58,7 @@ export default function CategoryFilters({
         <option value="not_featured">Not Featured</option>
       </select>
 
-      <button className="flex items-center justify-center gap-2 rounded-lg border px-5">
+      <button className="flex items-center justify-center gap-2 rounded-lg border px-5 md:col-span-2 xl:col-span-1">
         <Filter size={18} />
         Filter
       </button>
@@ -66,7 +66,7 @@ export default function CategoryFilters({
       <button
         type="button"
         onClick={resetFilters}
-        className="flex items-center justify-center gap-2 rounded-lg border px-5"
+        className="flex items-center justify-center gap-2 rounded-lg border px-5 md:col-span-2 xl:col-span-1"
       >
         <RotateCcw size={18} />
         Reset

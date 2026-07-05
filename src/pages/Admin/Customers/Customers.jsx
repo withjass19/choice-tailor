@@ -5,7 +5,7 @@ import { supabase } from "@/lib/supabase";
 import CustomerStats from "./_compomets/CustomerStats";
 import CustomerFilters from "./_compomets/CustomerFilters";
 import CustomersTable from "./_compomets/CustomersTable";
-import CustomerPagination from "./_compomets/CustomerPagination";
+import Pagination from "@/components/common/Pagination";
 // import { useAuth } from "@/context/AuthContext";
 
 export default function Customers() {
@@ -66,7 +66,7 @@ export default function Customers() {
           </p>
         </div>
 
-        <div className="flex gap-3">
+        <div className="flex flex-col gap-2 sm:flex-row">
           <button className="flex items-center gap-2 rounded-lg border bg-white px-5 py-3 text-sm font-semibold">
             <Download size={17} />
             Export Customers
@@ -90,7 +90,16 @@ export default function Customers() {
           refreshCustomers={fetchCustomers}
         />
 
-        <CustomerPagination totalCustomers={filteredCustomers.length} />
+        <Pagination
+          page={1}
+          setPage={() => {}}
+          totalItems={filteredCustomers.length}
+          totalPages={1}
+          pageSize={10}
+          setPageSize={() => {}}
+          label="customers"
+          className="rounded-b-xl border-x border-b"
+        />
       </div>
     </div>
   );

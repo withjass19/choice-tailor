@@ -16,6 +16,8 @@ import {
   XCircle,
 } from "lucide-react";
 import { toast } from "sonner";
+import Pagination from "@/components/common/Pagination";
+import StatusBadge from "@/components/common/StatusBadge";
 import { supabase } from "@/lib/supabase";
 
 const summaryConfig = [
@@ -200,11 +202,11 @@ export default function AdminOrders() {
           </p>
         </div>
 
-        <div className="flex gap-3">
+        <div className="flex flex-col gap-2 sm:flex-row">
           <button
             type="button"
             onClick={exportOrders}
-            className="flex items-center gap-2 rounded-lg border bg-white px-5 py-3 text-sm font-semibold"
+            className="flex items-center justify-center gap-2 rounded-lg border bg-white px-5 py-3 text-sm font-semibold"
           >
             <Download size={17} />
             Export Orders
@@ -212,7 +214,7 @@ export default function AdminOrders() {
 
           <button
             type="button"
-            className="flex items-center gap-2 rounded-lg bg-[#061735] px-5 py-3 text-sm font-semibold text-white"
+            className="flex items-center justify-center gap-2 rounded-lg bg-[#061735] px-5 py-3 text-sm font-semibold text-white"
           >
             <Plus size={17} />
             Add Order
@@ -221,7 +223,7 @@ export default function AdminOrders() {
       </div>
 
       <div className="overflow-hidden rounded-xl border bg-white">
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 xl:grid-cols-9">
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-9">
           {summaryConfig.map((item, index) => {
             const Icon = item.icon;
 
@@ -263,7 +265,7 @@ export default function AdminOrders() {
       </div>
 
       <div className="overflow-hidden rounded-xl border bg-white shadow-sm">
-        <div className="grid gap-4 border-b p-4 lg:grid-cols-[1.5fr_1fr_1fr_1fr_auto]">
+        <div className="grid gap-3 border-b p-4 md:grid-cols-2 xl:grid-cols-[1.5fr_1fr_1fr_1fr_auto]">
           <div className="relative">
             <Search
               size={18}
@@ -478,29 +480,16 @@ export default function AdminOrders() {
           </table>
         </div>
 
-        <div className="flex flex-col gap-4 p-5 sm:flex-row sm:items-center sm:justify-between">
-          <p className="text-sm text-gray-600">
-            Showing {filteredOrders.length} of {orders.length} orders
-          </p>
-
-          <div className="flex items-center gap-3">
-            <button type="button" className="rounded-lg border px-4 py-2 text-sm">
-              10 per page
-            </button>
-
-            <button type="button" className="flex h-9 w-9 items-center justify-center rounded-lg border">
-              <ChevronLeft size={16} />
-            </button>
-
-            <button type="button" className="h-9 w-9 rounded-lg border bg-[#061735] text-sm text-white">
-              1
-            </button>
-
-            <button type="button" className="flex h-9 w-9 items-center justify-center rounded-lg border">
-              <ChevronRight size={16} />
-            </button>
-          </div>
-        </div>
+        <Pagination
+          page={1}
+          setPage={() => {}}
+          totalItems={filteredOrders.length}
+          totalPages={1}
+          pageSize={10}
+          setPageSize={() => {}}
+          label="orders"
+          className="rounded-b-xl border-x border-b"
+        />
       </div>
     </div>
   );
@@ -519,33 +508,4 @@ function getInitials(name = "") {
 
 function formatStatus(status = "") {
   return status ? status.replaceAll("_", " ") : "-";
-}
-
-function StatusBadge({ children, type }) {
-  const styles = {
-    Verified: "bg-green-100 text-green-700",
-    Pending: "bg-orange-100 text-orange-700",
-    pending: "bg-orange-100 text-orange-700",
-    paid: "bg-green-100 text-green-700",
-    failed: "bg-red-100 text-red-700",
-    refunded: "bg-red-100 text-red-700",
-    confirmed: "bg-blue-100 text-blue-700",
-    cutting: "bg-orange-100 text-orange-700",
-    stitching: "bg-orange-100 text-orange-700",
-    quality_check: "bg-purple-100 text-purple-700",
-    packed: "bg-indigo-100 text-indigo-700",
-    shipped: "bg-green-100 text-green-700",
-    delivered: "bg-green-100 text-green-700",
-    cancelled: "bg-red-100 text-red-700",
-  };
-
-  return (
-    <span
-      className={`inline-flex rounded-full px-3 py-1 text-xs font-semibold capitalize ${
-        styles[type] || "bg-gray-100 text-gray-700"
-      }`}
-    >
-      {children}
-    </span>
-  );
 }

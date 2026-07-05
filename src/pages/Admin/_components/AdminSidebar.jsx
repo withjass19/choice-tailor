@@ -7,6 +7,7 @@ import {
   FolderTree,
   BarChart3,
   Settings,
+  X,
 } from "lucide-react";
 
 import { NavLink } from "react-router-dom";
@@ -54,20 +55,23 @@ const menus = [
   },
 ];
 
-export default function AdminSidebar() {
+export default function AdminSidebar({ onNavigate }) {
   return (
-    <aside className="w-[260px] bg-[#061735] text-white min-h-screen">
-      <div className="p-6">
-        <h2 className="text-2xl font-bold">
-          CHOICE TAILOR
-        </h2>
+    <aside className="flex h-screen w-full flex-col overflow-y-auto bg-[#061735] text-white shadow-[8px_0_30px_rgba(6,23,53,0.16)]">
+      <div className="flex items-start justify-between p-6">
+        <div>
+          <h2 className="text-2xl font-bold">CHOICE TAILOR</h2>
+          <p className="text-xs text-gray-300">ADMIN PANEL</p>
+        </div>
 
-        <p className="text-xs text-gray-300">
-          ADMIN PANEL
-        </p>
+        {onNavigate && (
+          <button type="button" onClick={onNavigate} className="rounded-md p-2 text-white/80 lg:hidden">
+            <X size={18} />
+          </button>
+        )}
       </div>
 
-      <div className="px-4 space-y-2">
+      <div className="space-y-2 px-4 pb-6">
         {menus.map((item) => {
           const Icon = item.icon;
 
@@ -76,13 +80,11 @@ export default function AdminSidebar() {
               key={item.title}
               to={item.path}
               end={item.path === "/admin"}
+              onClick={onNavigate}
               className={({ isActive }) =>
-                `flex items-center gap-3 rounded-lg px-4 py-3
-                 ${
-                   isActive
-                     ? "bg-[#c89227]"
-                     : "hover:bg-[#10264d]"
-                 }`
+                `flex items-center gap-3 rounded-lg px-4 py-3 transition-colors ${
+                  isActive ? "bg-[#c89227]" : "hover:bg-[#10264d]"
+                }`
               }
             >
               <Icon size={18} />

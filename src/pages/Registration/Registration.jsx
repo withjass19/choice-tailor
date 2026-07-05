@@ -59,7 +59,7 @@ export default function Registeration() {
 
   return (
     <main
-      className="relative min-h-screen overflow-hidden bg-[#061735] bg-cover bg-center bg-no-repeat px-4 py-6 sm:px-6 lg:px-10"
+      className="relative min-h-screen overflow-x-hidden bg-[#061735] bg-cover bg-center bg-no-repeat px-4 py-6 sm:px-6 lg:px-10"
       style={{ backgroundImage: `url(${loginBG})` }}
     >
       {/* <div className="absolute inset-0 bg-[#061735]/75 w-[70%] bg-cover bg-center" style={{ backgroundImage: `url(${loginBG})` }} /> */}
@@ -137,7 +137,7 @@ export default function Registeration() {
         </div>
 
         <div className="flex justify-center lg:justify-end">
-          <div className="w-full max-w-[500px] rounded-2xl bg-white px-5 py-5 shadow-2xl sm:px-7 sm:py-6">
+          <div className="w-full max-w-[500px] rounded-2xl bg-white px-4 py-5 shadow-2xl sm:px-7 sm:py-6">
             <div className="text-center">
               <div className="mx-auto flex h-11 w-11 items-center justify-center rounded-full bg-[#f4f1eb] text-[#b08018]">
                 <User size={20} />
@@ -176,7 +176,7 @@ export default function Registeration() {
                 error={errors.phone?.message}
               />
 
-              <div className="grid gap-3 sm:grid-cols-2">
+              <div className="grid gap-3 grid-cols-1 sm:grid-cols-2">
                 <FormInput
                   icon={<Lock size={17} />}
                   rightIcon={<Eye size={17} />}

@@ -4,38 +4,21 @@ import OrderSteps from "./_components/OrderSteps";
 import PopularItems from "./_components/PopularItems";
 import TestimonialsSection from "./_components/TestimonialSection";
 import WhyChooseSection from "./_components/WhyChooseSection";
-import { useState, useEffect } from "react";
-import { supabase } from "@/lib/supabase";
+
+import { useHomePageData } from "@/hooks/useHomePageData";
 
 export default function Home() {
-  const [popularProducts, setPopularProducts] = useState([]);
-
-  useEffect(() => {
-    const fetchPopularProducts = async () => {
-      const { data } = await supabase
-        .from("products")
-        .select("*")
-        .eq("status", "Active")
-        // .eq("featured_product", true)
-        .limit(12);
-
-      console.log("Popular Products:", data); // Log the fetched data for debugging
-
-      setPopularProducts(data || []);
-    };
-
-    fetchPopularProducts();
-  }, []);
+  const { popularProducts, categories, loadingCategories, loadingProducts } =
+    useHomePageData();
 
   return (
-    <div className="w-[100%]">
+    <div className="w-full">
       <HeroSection />
-      <Categories />
+      <Categories categories={categories} loading={loadingCategories} />
       <OrderSteps />
-      <PopularItems products={popularProducts} />
+      <PopularItems products={popularProducts} loading={loadingProducts} />
       <WhyChooseSection />
       <TestimonialsSection />
-      {/* <Footer/> */}
     </div>
   );
 }

@@ -7,7 +7,7 @@ import { supabase } from "@/lib/supabase";
 import CategoryStats from "./_components/CategoryStats";
 import CategoryFilters from "./_components/CategoryFilters";
 import CategoriesTable from "./_components/CategoriesTable";
-import CategoryPagination from "./_components/CategoryPagination";
+import Pagination from "@/components/common/Pagination";
 
 import AddCategoryDialog from "./_components/AddCategoryDialog";
 import EditCategoryDialog from "./_components/EditCategoryDialog";
@@ -478,13 +478,15 @@ export default function Categories() {
           onToggleVisibility={toggleVisibility}
         />
 
-        <CategoryPagination
+        <Pagination
           page={page}
           setPage={setPage}
           totalItems={filteredCategories.length}
           totalPages={totalPages}
           pageSize={pageSize}
           setPageSize={setPageSize}
+          label="categories"
+          className="border-x border-b"
         />
       </div>
 

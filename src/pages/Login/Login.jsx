@@ -63,7 +63,7 @@ export default function LoginPage() {
 
   return (
     <main
-      className="relative min-h-screen overflow-hidden bg-[#061735] bg-cover bg-center bg-no-repeat px-4 py-6 sm:px-6 lg:px-10"
+      className="relative min-h-screen overflow-x-hidden bg-[#061735] bg-cover bg-center bg-no-repeat px-4 py-6 sm:px-6 lg:px-10"
       style={{ backgroundImage: `url(${loginBG})` }}
     >
       <div className="absolute inset-0 bg-[#061735]/75" />
@@ -141,7 +141,7 @@ export default function LoginPage() {
 
         {/* Form */}
         <div className="flex justify-center lg:justify-end">
-          <div className="w-full max-w-[460px] rounded-2xl bg-white px-5 py-6 shadow-2xl sm:px-7 sm:py-7">
+          <div className="w-full max-w-[460px] rounded-2xl bg-white px-4 py-5 shadow-2xl sm:px-7 sm:py-7">
             <div className="text-center">
               <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-[#f4f1eb] text-[#b08018]">
                 <User size={20} />
@@ -209,7 +209,7 @@ export default function LoginPage() {
                 )}
               </div>
 
-              <div className="flex items-center justify-between gap-3 text-sm">
+              <div className="flex flex-col gap-3 text-sm sm:flex-row sm:items-center sm:justify-between">
                 <label className="flex items-center gap-2 text-[#061735]">
                   <input
                     type="checkbox"

@@ -1,41 +1,8 @@
-import { useEffect, useState } from "react";
 import { IoAirplane } from "react-icons/io5";
-import { toast } from "sonner";
 
-import { supabase } from "@/lib/supabase";
 import CategroyCard from "../../../components/CategoryCard/CategoryCard";
 
-export default function Categories() {
-  const [categories, setCategories] = useState([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const fetchCategories = async () => {
-      try {
-        setLoading(true);
-
-        const { data, error } = await supabase
-          .from("categories")
-          .select("id, name, image, display_order")
-          .eq("status", "Active")
-          .eq("show_on_homepage", true)
-          .order("display_order", { ascending: true })
-          .limit(8);
-
-        if (error) throw error;
-
-        setCategories(data || []);
-      } catch (error) {
-        console.error("Categories fetch failed:", error);
-        toast.error("Failed to load categories.");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchCategories();
-  }, []);
-
+export default function Categories({ categories = [], loading = false }) {
   return (
     <section className="px-4 py-12 md:px-8 lg:px-12">
       <div className="text-center">

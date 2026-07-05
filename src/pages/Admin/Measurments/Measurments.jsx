@@ -224,7 +224,7 @@ export default function AdminMeasurements() {
           </p>
         </div>
 
-        <div className="flex gap-3">
+        <div className="flex flex-col gap-2 sm:flex-row">
           <button className="flex items-center gap-2 rounded-lg border bg-white px-5 py-3 text-sm font-semibold">
             <Download size={17} />
             Export Measurements
@@ -269,7 +269,7 @@ export default function AdminMeasurements() {
         })}
       </div>
 
-      <div className="grid gap-4 lg:grid-cols-[1.5fr_0.7fr_0.7fr_0.7fr_1.1fr_auto]">
+      <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-[1.5fr_0.7fr_0.7fr_0.7fr_1.1fr_auto]">
         <div className="relative">
           <Search size={18} className="absolute right-4 top-1/2 -translate-y-1/2 text-[#061735]" />
           <input
@@ -288,7 +288,7 @@ export default function AdminMeasurements() {
           <ChevronDown size={16} />
         </button>
 
-        <button className="flex items-center justify-center gap-2 rounded-lg border bg-white px-5 py-3 text-sm font-semibold">
+        <button className="flex items-center justify-center gap-2 rounded-lg border bg-white px-5 py-3 text-sm font-semibold md:col-span-2 xl:col-span-1">
           <Filter size={17} />
           Filter
         </button>

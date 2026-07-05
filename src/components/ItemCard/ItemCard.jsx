@@ -21,13 +21,13 @@ export default function ItemCard({ id, src, categroy, price, subCategory }) {
   };
 
   return (
-    <div className="group flex h-[260px] w-full flex-col items-center justify-between rounded-xl border border-gray-200 bg-white p-4 text-center shadow-md transition-all duration-300 hover:-translate-y-1 hover:border-[#b89b3c] hover:shadow-xl sm:h-[280px]">
+    <div className="group flex h-full min-h-[260px] w-full flex-col items-center justify-between rounded-xl border border-gray-200 bg-white p-4 text-center shadow-md transition-all duration-300 hover:-translate-y-1 hover:border-[#b89b3c] hover:shadow-xl sm:h-[280px]">
       {/* Image */}
       <div className="flex h-28 w-full items-center justify-center">
         <img
           src={src}
           alt={categroy}
-          className="h-full max-w-[120px] object-contain"
+          className="h-full w-full max-w-[120px] object-contain"
         />
       </div>
 
@@ -43,11 +43,11 @@ export default function ItemCard({ id, src, categroy, price, subCategory }) {
       </div>
 
       {/* Buttons */}
-      <div className="flex w-full items-center gap-2 text-xs">
+      <div className="flex w-full flex-col items-center gap-2 text-xs sm:flex-row">
         <button
           type="button"
           onClick={() => navigate(`/product/${id}`)}
-          className="flex-1 rounded-md border border-[#061735] px-3 py-2 font-medium text-[#061735] transition hover:bg-[#061735] hover:text-white"
+          className="w-full flex-1 rounded-md border border-[#061735] px-3 py-2 font-medium text-[#061735] transition hover:bg-[#061735] hover:text-white sm:w-auto"
         >
           View Details
         </button>
