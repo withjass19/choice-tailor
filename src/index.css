@@ -113,10 +113,10 @@ body,
 #root {
   height: 100%;
   margin: 0;
-  overflow: hidden;
 }
 
 body {
+  overflow-x: hidden;
   font-family: var(--font-body);
   background: var(--background);
   color: var(--text-primary);
