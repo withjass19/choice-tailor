@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { Image as ImageIcon, Upload, X } from "lucide-react";
 import { toast } from "sonner";
 
 import {
@@ -25,6 +26,8 @@ const initialForm = {
   seo_description: "",
 };
 
+const IMAGEKIT_UPLOAD_URL = "https://upload.imagekit.io/api/v1/files/upload";
+
 export default function EditCategoryDialog({
   open,
   setOpen,
@@ -34,6 +37,9 @@ export default function EditCategoryDialog({
 }) {
   const [form, setForm] = useState(initialForm);
   const [loading, setLoading] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const [selectedImage, setSelectedImage] = useState(null);
+  const [preview, setPreview] = useState("");
 
   useEffect(() => {
     if (!category) return;
@@ -51,7 +57,20 @@ export default function EditCategoryDialog({
       seo_title: category.seo_title || "",
       seo_description: category.seo_description || "",
     });
+
+    setPreview(category.image || "");
+    setSelectedImage(null);
   }, [category]);
+
+  const getImageKitAuth = async () => {
+    const res = await fetch("/api/imagekit-auth");
+
+    if (!res.ok) {
+      throw new Error("ImageKit authentication failed.");
+    }
+
+    return res.json();
+  };
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -59,6 +78,82 @@ export default function EditCategoryDialog({
     setForm((prev) => ({
       ...prev,
       [name]: type === "checkbox" ? checked : value,
+    }));
+  };
+
+  const handleImageSelect = (e) => {
+    const file = e.target.files?.[0];
+
+    if (!file) return;
+
+    if (!file.type.startsWith("image/")) {
+      toast.error("Please select a valid image.");
+      return;
+    }
+
+    if (file.size > 2 * 1024 * 1024) {
+      toast.error("Image should be less than 2MB.");
+      return;
+    }
+
+    setSelectedImage(file);
+    setPreview(URL.createObjectURL(file));
+  };
+
+  const uploadImageToImageKit = async () => {
+    if (!selectedImage) {
+      toast.error("Please choose an image first.");
+      return;
+    }
+
+    try {
+      setUploading(true);
+
+      const auth = await getImageKitAuth();
+
+      const formData = new FormData();
+      formData.append("file", selectedImage);
+      formData.append("fileName", `category-${Date.now()}-${selectedImage.name}`);
+      formData.append("folder", "/choice-tailor/categories");
+      formData.append("publicKey", import.meta.env.VITE_IMAGEKIT_PUBLIC_KEY);
+      formData.append("signature", auth.signature);
+      formData.append("expire", auth.expire);
+      formData.append("token", auth.token);
+
+      const uploadRes = await fetch(IMAGEKIT_UPLOAD_URL, {
+        method: "POST",
+        body: formData,
+      });
+
+      const uploaded = await uploadRes.json();
+
+      if (!uploadRes.ok) {
+        throw new Error(uploaded?.message || "Image upload failed.");
+      }
+
+      setForm((prev) => ({
+        ...prev,
+        image: uploaded.url,
+      }));
+
+      setPreview(uploaded.url);
+      setSelectedImage(null);
+
+      toast.success("Image uploaded successfully.");
+    } catch (error) {
+      console.error("ImageKit upload failed:", error);
+      toast.error(error.message || "Image upload failed.");
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const removeImage = () => {
+    setSelectedImage(null);
+    setPreview("");
+    setForm((prev) => ({
+      ...prev,
+      image: "",
     }));
   };
 
@@ -77,6 +172,11 @@ export default function EditCategoryDialog({
       return;
     }
 
+    if (selectedImage && !form.image) {
+      toast.error("Please upload selected image first.");
+      return;
+    }
+
     try {
       setLoading(true);
 
@@ -84,7 +184,7 @@ export default function EditCategoryDialog({
         name: form.name.trim(),
         slug: form.slug.trim(),
         description: form.description.trim() || null,
-        image: form.image.trim() || null,
+        image: form.image || null,
         parent_category_id: form.parent_category_id || null,
         display_order: Number(form.display_order || 0),
         featured: form.featured,
@@ -145,6 +245,7 @@ export default function EditCategoryDialog({
             <label className="mb-2 block text-sm font-semibold text-[#061735]">
               Description
             </label>
+
             <textarea
               name="description"
               value={form.description}
@@ -154,18 +255,72 @@ export default function EditCategoryDialog({
             />
           </div>
 
-          <Input
-            label="Image URL"
-            name="image"
-            value={form.image}
-            onChange={handleChange}
-          />
+          <div>
+            <label className="mb-2 block text-sm font-semibold text-[#061735]">
+              Category Image
+            </label>
+
+            <div className="rounded-xl border border-dashed bg-gray-50 p-4">
+              {preview ? (
+                <div className="relative mx-auto h-40 w-40 rounded-xl border bg-white p-3">
+                  <img
+                    src={preview}
+                    alt="Category Preview"
+                    className="h-full w-full object-contain"
+                  />
+
+                  <button
+                    type="button"
+                    onClick={removeImage}
+                    className="absolute -right-2 -top-2 rounded-full bg-red-600 p-1 text-white"
+                  >
+                    <X size={16} />
+                  </button>
+                </div>
+              ) : (
+                <div className="flex flex-col items-center justify-center py-8 text-center text-gray-500">
+                  <ImageIcon size={42} />
+                  <p className="mt-2 text-sm">No image selected</p>
+                </div>
+              )}
+
+              <div className="mt-5 flex flex-col gap-3 sm:flex-row sm:justify-center">
+                <label className="flex cursor-pointer items-center justify-center gap-2 rounded-lg border bg-white px-5 py-2 text-sm font-semibold text-[#061735]">
+                  <ImageIcon size={17} />
+                  Choose Image
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleImageSelect}
+                    className="hidden"
+                  />
+                </label>
+
+                <button
+                  type="button"
+                  onClick={uploadImageToImageKit}
+                  disabled={!selectedImage || uploading}
+                  className="flex items-center justify-center gap-2 rounded-lg bg-[#061735] px-5 py-2 text-sm font-semibold text-white disabled:opacity-60"
+                >
+                  <Upload size={17} />
+                  {uploading ? "Uploading..." : "Upload Image"}
+                </button>
+              </div>
+
+              {form.image && (
+                <p className="mt-3 text-center text-xs font-medium text-green-700">
+                  Image uploaded and ready to save.
+                </p>
+              )}
+            </div>
+          </div>
 
           <div className="grid gap-4 md:grid-cols-2">
             <div>
               <label className="mb-2 block text-sm font-semibold text-[#061735]">
                 Parent Category
               </label>
+
               <select
                 name="parent_category_id"
                 value={form.parent_category_id}
@@ -173,6 +328,7 @@ export default function EditCategoryDialog({
                 className="w-full rounded-lg border px-4 py-3 text-sm outline-none"
               >
                 <option value="">No Parent</option>
+
                 {parentOptions.map((item) => (
                   <option key={item.id} value={item.id}>
                     {item.name}
@@ -195,6 +351,7 @@ export default function EditCategoryDialog({
               <label className="mb-2 block text-sm font-semibold text-[#061735]">
                 Status
               </label>
+
               <select
                 name="status"
                 value={form.status}
@@ -219,6 +376,7 @@ export default function EditCategoryDialog({
             <label className="mb-2 block text-sm font-semibold text-[#061735]">
               SEO Description
             </label>
+
             <textarea
               name="seo_description"
               value={form.seo_description}
@@ -255,7 +413,7 @@ export default function EditCategoryDialog({
 
             <button
               type="submit"
-              disabled={loading}
+              disabled={loading || uploading}
               className="rounded-lg bg-[#061735] px-6 py-2 font-semibold text-white disabled:opacity-60"
             >
               {loading ? "Updating..." : "Update Category"}
@@ -273,6 +431,7 @@ function Input({ label, name, value, onChange, type = "text" }) {
       <label className="mb-2 block text-sm font-semibold text-[#061735]">
         {label}
       </label>
+
       <input
         type={type}
         name={name}
