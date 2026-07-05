@@ -41,11 +41,15 @@ export default function CategoriesTable({
             <div key={item.id} className="rounded-xl border bg-white p-4 shadow-sm">
               <div className="flex items-start justify-between gap-3">
                 <div className="flex items-center gap-3">
-                  <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-[#f6efe1] text-[#b89b3c]">
+                  <div className="flex h-12 w-12 items-center justify-center rounded-lg  text-[#b89b3c]">
                     {item.image ? (
-                      <img src={item.image} alt={item.name} className="h-full w-full rounded-lg object-cover" />
+                      <div>
+                        <img src={item.image} alt={item.name} className="h-full w-full rounded-lg object-cover" />
+                      </div>
                     ) : (
-                      <Package size={22} />
+                      <div className="bg-[#f6efe1]">
+                        <Package size={22} />
+                      </div>
                     )}
                   </div>
                   <div>
