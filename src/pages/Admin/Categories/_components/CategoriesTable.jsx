@@ -41,15 +41,11 @@ export default function CategoriesTable({
             <div key={item.id} className="rounded-xl border bg-white p-4 shadow-sm">
               <div className="flex items-start justify-between gap-3">
                 <div className="flex items-center gap-3">
-                  <div className="flex h-12 w-12 items-center justify-center rounded-lg  text-[#b89b3c]">
+                  <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-[#f6efe1] text-[#b89b3c]">
                     {item.image ? (
-                      <div>
-                        <img src={item.image} alt={item.name} className="h-full w-full rounded-lg object-cover" />
-                      </div>
+                      <img src={item.image} alt={item.name} className="h-full w-full rounded-lg object-cover" />
                     ) : (
-                      <div className="bg-[#f6efe1]">
-                        <Package size={22} />
-                      </div>
+                      <Package size={22} />
                     )}
                   </div>
                   <div>
@@ -143,7 +139,7 @@ export default function CategoriesTable({
 
                 <td className="px-4 py-5">
                   <div className="flex items-center gap-3">
-                    <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-[#f6efe1] text-[#b89b3c]">
+                    <div className="flex h-12 w-12 items-center justify-center rounded-lg text-[#b89b3c]">
                       {item.image ? (
                         <img
                           src={item.image}
@@ -151,7 +147,9 @@ export default function CategoriesTable({
                           className="h-full w-full rounded-lg object-cover"
                         />
                       ) : (
-                        <Package size={22} />
+                        <div className="bg-[#f6efe1] h-full w-full flex items-center justify-center rounded-lg">
+                          <Package size={22} />
+                        </div>
                       )}
                     </div>
 
