@@ -21,7 +21,7 @@ export default function CategroyCard({ categroy, image, width, height }) {
         </p>
 
         <span className="mt-1 inline-block text-xs font-semibold text-[#b89b3c] opacity-0 transition group-hover:opacity-100">
-          Explore →
+          {/* Explore → */}
         </span>
       </div>
     </div>
